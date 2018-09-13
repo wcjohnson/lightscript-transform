@@ -1,0 +1,56 @@
+import findBabelOptionsForPlugin from './util/findBabelOptionsForPlugin'
+import parseConfigurationDirectives from './util/parseConfigurationDirectives'
+import patch from './util/babelTypesPatch'
+import { registerLightscriptNodeTypes } from './lscNodeTypes'
+
+import { Options } from './options'
+
+import { parse } from '@lightscript/parser'
+
+import mainPass from './visitors/main'
+
+export class CompilerState:
+  constructor(babel) ->
+    this.babel = babel
+    this.options = new Options(this)
+
+  debugDump() ->
+    rst = Object.assign({}, this)
+    delete rst.babel
+    rst
+
+  // Babel manipulateOptions hook
+  // Here we can learn the filename (opts.filename) we're parsing, plus any user
+  // provided options
+  manipulateOptions(opts, parserOpts, plugin): void ->
+    this.options.setOptions(opts, parserOpts, findBabelOptionsForPlugin(opts, plugin))
+
+    // Add references to the compiler accessible from the Babel config
+    opts.lscCompiler = this
+    parserOpts.lscCompiler = this
+
+  // Babel parserOverride hook
+  // Here we can parse configuration directives from the actual code
+  parserOverride(code, parserOpts) ->
+    this.options.setPreParseOptions(parserOpts, parseConfigurationDirectives(code))
+    lscParserOpts = this.options.getParserOptions()
+
+    //console.log("parseOverride", lscParserOpts)
+
+    parse(code, lscParserOpts)
+
+  // Determine if the file we're working on should be treated as LightScript.
+  isLightScript(): boolean ->
+    this.options.isLightScript
+
+  // Main program visitor
+  visitProgram(path, state): void ->
+    // Only transform LightScript files.
+    if not this.isLightScript(): return
+
+    // Patch the relevant instance of babel-types
+    { babel } = this
+    patch(babel.types)
+    registerLightscriptNodeTypes(babel.types)
+
+    mainPass(this, path)

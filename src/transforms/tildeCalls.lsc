@@ -1,0 +1,45 @@
+import t, { is, isa } from '../types'
+import { hoistRef } from '../helpers/variables'
+
+isOptionalNode(node) ->
+  match node.type:
+    | "OptionalMemberExpression": true
+    | "OptionalCallExpression": true
+    | "LscOptionalTildeCallExpression": true
+    | else: false
+
+export transformTildeCall(path) ->
+  { node } = path
+  next = t.callExpression(node.callee, [node.left, ...node.arguments])
+  if node.typeArguments: next.typeArguments = node.typeArguments
+  if node.typeParameters: next.typeParameters = node.typeParameters
+  path.replaceWith(next)
+
+export transformOptionalTildeCall(path) ->
+  { node } = path
+
+  let hoistedLeft = node.left
+  let hoistedCallee = node.callee
+
+  leftCheck = if node.leftOptional or node.left~isOptionalNode():
+    memoized = hoistRef(path, node.left)
+    now hoistedLeft = memoized.ref
+    t.binaryExpression('!=', memoized.assign, t.nullLiteral())
+
+  calleeCheck = if node.calleeOptional or node.callee~isOptionalNode():
+    memoized = hoistRef(path, node.callee)
+    now hoistedCallee = memoized.ref
+    t.binaryExpression('!=', memoized.assign, t.nullLiteral())
+
+  conditionalTest = if leftCheck and calleeCheck:
+    t.logicalExpression('&&', leftCheck, calleeCheck)
+  else:
+    (leftCheck or calleeCheck)
+
+  callNode = t.callExpression(hoistedCallee, [hoistedLeft, ...node.arguments])
+  if node.typeArguments: callNode.typeArguments = node.typeArguments
+  if node.typeParameters: callNode.typeParameters = node.typeParameters
+
+  path.replaceWith(
+    t.conditionalExpression(conditionalTest, callNode, path.scope.buildUndefinedNode())
+  )

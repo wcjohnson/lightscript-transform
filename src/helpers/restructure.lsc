@@ -1,0 +1,49 @@
+import t, { isa } from '../types'
+import atNode from 'ast-loc-utils/lib/placeAtNode'
+
+export isDestructuringPattern(node) ->
+  node.type == "ArrayPattern" or node.type == "ObjectPattern"
+
+////////// "Restructuring" after a destructure
+export toRestructureExpression(pattern) ->
+  match pattern.type:
+    | "ArrayPattern": pattern~toRestructureExpressionForArrayPattern()
+    | "ObjectPattern": pattern~toRestructureExpressionForObjectPattern()
+
+maybeToRestructureExpression(node) ->
+  if node~isDestructuringPattern(): node~toRestructureExpression() else: node
+
+export toRestructureExpressionForArrayPattern(pattern) ->
+  t.arrayExpression(
+    [...for elem element in pattern.elements:
+      match element:
+        | ~isa("AssignmentPattern"): element.left~maybeToRestructureExpression()
+        | ~isa("RestElement"): t.spreadElement(element.argument)~atNode(element)
+        | ~isDestructuringPattern(): element~toRestructureExpression()
+        | else: element
+    ]
+  )~atNode(pattern)
+
+restructureObjAssignment(assign, defaultKey) ->
+  if assign.left~isDestructuringPattern():
+    t.objectProperty(defaultKey, assign.left~toRestructureExpression())
+  else:
+    t.objectProperty(assign.left, assign.left, false, true)
+
+export toRestructureExpressionForObjectPattern(pattern) ->
+  t.objectExpression(
+    [...for elem property in pattern.properties:
+      match property:
+        | ~isa("RestElement"):
+          t.spreadElement(property.argument)~atNode(property)
+        | as {key, value} if value~isDestructuringPattern():
+          t.objectProperty(
+            key
+            value~toRestructureExpression()
+          )~atNode(property)
+        | as {key, value} if value~isa("AssignmentPattern"):
+          value~restructureObjAssignment(key)~atNode(property)
+        | as {value} if value~isa("Identifier"):
+          t.objectProperty(value, value, false, true)~atNode(property)
+    ]
+  )~atNode(pattern)

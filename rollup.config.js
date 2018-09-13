@@ -49,7 +49,7 @@ var withFormat = (format) => ({
   output: {
     file: format === "cjs" ? `lib/index.js` : `lib/index.${format}.js`,
     format: format,
-    sourcemap: 'inline'
+    sourcemap: true
   },
   plugins: getPlugins(),
   external: isExternal

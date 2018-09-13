@@ -1,0 +1,348 @@
+export registerLightscriptNodeTypes(t): void ->
+  {
+    definePluginType, assertNodeType
+    assertValueType, assertOneOf
+    assertEach, chain
+  } = t
+
+  if not t.hasType("LscTildeCallExpression"):
+    definePluginType("LscTildeCallExpression", {
+      visitor: ["left", "callee", "arguments", "typeParameters", "typeArguments"],
+      builder: ["left", "callee", "arguments"],
+      aliases: ["Expression"],
+      fields: {
+        left: {
+          validate: assertNodeType("Expression"),
+        },
+        callee: {
+          validate: assertNodeType("Expression"),
+        },
+        arguments: {
+          validate: chain(
+            assertValueType("array"),
+            assertEach(
+              assertNodeType("Expression", "SpreadElement", "JSXNamespacedName"),
+            ),
+          ),
+        },
+        calleeOptional: {
+          validate: assertOneOf(true, false),
+          optional: true,
+        },
+        leftOptional: {
+          validate: assertOneOf(true, false),
+          optional: true,
+        },
+        typeArguments: {
+          validate: assertNodeType("TypeParameterInstantiation"),
+          optional: true,
+        },
+        typeParameters: {
+          validate: assertNodeType("TSTypeParameterInstantiation"),
+          optional: true,
+        },
+      },
+    })
+
+  if not t.hasType("LscOptionalTildeCallExpression"):
+    definePluginType("LscOptionalTildeCallExpression", {
+      visitor: ["left", "callee", "arguments", "typeParameters", "typeArguments"],
+      builder: ["left", "callee", "arguments"],
+      aliases: ["Expression"],
+      fields: {
+        left: {
+          validate: assertNodeType("Expression"),
+        },
+        callee: {
+          validate: assertNodeType("Expression"),
+        },
+        arguments: {
+          validate: chain(
+            assertValueType("array"),
+            assertEach(
+              assertNodeType("Expression", "SpreadElement", "JSXNamespacedName"),
+            ),
+          ),
+        },
+        calleeOptional: {
+          validate: assertOneOf(true, false),
+          optional: true,
+        },
+        leftOptional: {
+          validate: assertOneOf(true, false),
+          optional: true,
+        },
+        typeArguments: {
+          validate: assertNodeType("TypeParameterInstantiation"),
+          optional: true,
+        },
+        typeParameters: {
+          validate: assertNodeType("TSTypeParameterInstantiation"),
+          optional: true,
+        },
+      },
+    })
+
+  if not t.hasType("LscForInArrayStatement"):
+    definePluginType("LscForInArrayStatement", {
+      visitor: ["idx", "elem", "array", "body"],
+      aliases: ["Scopable", "Statement", "For", "BlockParent", "Loop", "ForXStatement", "ForIn"],
+      fields: {
+        elem: {
+          validate: assertNodeType("Identifier"),
+          optional: true,
+        },
+        idx: {
+          validate: assertNodeType("Identifier"),
+          optional: true,
+        },
+        array: {
+          validate: assertNodeType("Expression"),
+        },
+        body: {
+          validate: assertNodeType("Statement"),
+        },
+      },
+    });
+
+  if not t.hasType("LscForInObjectStatement"):
+    definePluginType("LscForInObjectStatement", {
+      visitor: ["key", "val", "object", "body"],
+      aliases: ["Scopable", "Statement", "For", "BlockParent", "Loop", "ForXStatement", "ForIn"],
+      fields: {
+        key: {
+          validate: assertNodeType("Identifier"),
+          optional: true,
+        },
+        val: {
+          validate: assertNodeType("Identifier"),
+          optional: true,
+        },
+        object: {
+          validate: assertNodeType("Expression"),
+        },
+        body: {
+          validate: assertNodeType("Statement"),
+        },
+      },
+    });
+
+  if not t.hasType("LscSpreadLoop"):
+    definePluginType("LscSpreadLoop", {
+      builder: ["loop"]
+      visitor: ["loop"]
+      aliases: ["Expression"]
+      fields: {
+        loop: {
+          validate: assertNodeType("ForStatement")
+        }
+      }
+    })
+
+  if not t.hasType("LscNamedArrowDeclaration"):
+    definePluginType("LscNamedArrowDeclaration", {
+      builder: ["id", "params", "body", "skinny", "async", "generator"],
+      visitor: ["id", "params", "body", "returnType", "typeParameters"],
+      aliases: [
+        "Scopable",
+        "Function",
+        "BlockParent",
+        "FunctionParent",
+        "Statement",
+        "Pureish",
+        "Declaration",
+        "FunctionDeclaration",
+        "NamedArrowFunction",
+      ],
+      fields: {  // DUP in NamedArrowMemberExpression
+        id: {
+          validate: assertNodeType("Identifier"),
+        },
+        params: {
+          validate: chain(
+            assertValueType("array"),
+            assertEach(assertNodeType("LVal"))
+          ),
+        },
+        body: {
+          validate: assertNodeType("BlockStatement", "Expression"),
+        },
+        skinny: {
+          validate: assertValueType("boolean")
+        },
+        generator: {
+          default: false,
+          validate: assertValueType("boolean")
+        },
+        async: {
+          default: false,
+          validate: assertValueType("boolean")
+        },
+      },
+    });
+
+  if not t.hasType("LscNamedArrowExpression"):
+    definePluginType("LscNamedArrowExpression", {
+      inherits: "LscNamedArrowDeclaration",
+      aliases: [
+        "Scopable",
+        "Function",
+        "FunctionExpression",
+        "BlockParent",
+        "FunctionParent",
+        "Expression",
+        "Pureish",
+        "NamedArrowFunction",
+      ],
+    });
+
+  if not t.hasType("LscNamedArrowMemberExpression"):
+    definePluginType("LscNamedArrowMemberExpression", {
+      inherits: "LscNamedArrowExpression",
+      fields: {  // c/p from NamedArrowExpression except for `object`
+        id: {
+          validate: assertNodeType("Identifier"),
+        },
+        object: {
+          validate: assertNodeType("Identifier", "MemberExpression"),
+        },
+        params: {
+          validate: chain(
+            assertValueType("array"),
+            assertEach(assertNodeType("LVal"))
+          ),
+        },
+        body: {
+          validate: assertNodeType("BlockStatement", "Expression"),
+        },
+        skinny: {
+          validate: assertValueType("boolean")
+        },
+        generator: {
+          default: false,
+          validate: assertValueType("boolean")
+        },
+        async: {
+          default: false,
+          validate: assertValueType("boolean")
+        },
+      },
+    });
+
+  if not t.hasType("LscIfExpression"):
+    definePluginType("LscIfExpression", {
+      visitor: ["test", "consequent", "alternate"],
+      aliases: ["Expression", "Conditional"],
+      fields: {
+        test: {
+          validate: assertNodeType("Expression")
+        },
+        consequent: {
+          validate: assertNodeType("Expression", "BlockStatement", "ExpressionStatement")
+        },
+        alternate: {
+          optional: true,
+          validate: assertNodeType("Expression", "BlockStatement", "ExpressionStatement")
+        }
+      }
+    });
+
+  if not t.hasType("LscMatchExpression"):
+    definePluginType("LscMatchExpression", {
+      builder: ["discriminant", "cases"],
+      visitor: ["discriminant", "cases"],
+      aliases: ["Expression", "Conditional"],
+      fields: {
+        discriminant: {
+          validate: assertNodeType("Expression")
+        },
+        cases: {
+          validate: chain(assertValueType("array"), assertEach(assertNodeType("MatchCase")))
+        }
+      }
+    });
+
+  if not t.hasType("LscMatchStatement"):
+    definePluginType("LscMatchStatement", {
+      builder: ["discriminant", "cases"],
+      visitor: ["discriminant", "cases"],
+      aliases: ["Statement", "Conditional"],
+      fields: {
+        discriminant: {
+          validate: assertNodeType("Expression")
+        },
+        cases: {
+          validate: chain(assertValueType("array"), assertEach(assertNodeType("MatchCase")))
+        }
+      }
+    });
+
+  if not t.hasType("LscMatchCase"):
+    definePluginType("LscMatchCase", {
+      builder: ["outerGuard", "atoms", "binding", "assertive", "innerGuard", "consequent"],
+      visitor: ["test", "outerGuard", "atoms", "binding", "innerGuard", "consequent"],
+      fields: {
+        // XXX: v3 compatibility, remove when syntax settles
+        test: {
+          validate: assertNodeType("Expression", "MatchElse")
+          optional: true
+        }
+        outerGuard: {
+          validate: assertNodeType("Expression", "MatchElse")
+          optional: true
+        }
+        atoms: {
+          validate: chain(assertValueType("array"), assertEach(assertNodeType("Expression")))
+          optional: true
+        }
+        binding: {
+          validate: assertNodeType("ArrayPattern", "ObjectPattern")
+          optional: true
+        }
+        assertive: {
+          validate: assertValueType("boolean")
+          optional: true
+        }
+        innerGuard: {
+          validate: assertNodeType("Expression")
+          optional: true
+        }
+        consequent: {
+          validate: assertNodeType("Expression", "Statement")
+        }
+      }
+    });
+
+  if not t.hasType("LscMatchElse"):
+    definePluginType("LscMatchElse", {
+    });
+
+  if not t.hasType("LscMatchPlaceholderExpression"):
+    definePluginType("LscMatchPlaceholderExpression", {
+      aliases: ["Expression"]
+    });
+
+  if not t.hasType("LscPlaceholderExpression"):
+    definePluginType("LscPlaceholderExpression", {
+      aliases: ["Expression"]
+    });
+
+  if not t.hasType("LscTryExpression"):
+    definePluginType("LscTryExpression", {
+      builder: ["block", "handler", "finalizer"],
+      visitor: ["block", "handler", "finalizer"],
+      aliases: ["Expression"],
+      fields: {
+        block: {
+          validate: assertNodeType("Expression", "BlockStatement"),
+        },
+        handler: {
+          optional: true,
+          validate: assertNodeType("CatchClause"),
+        },
+        finalizer: {
+          optional: true,
+          validate: assertNodeType("BlockStatement"),
+        },
+      },
+    });

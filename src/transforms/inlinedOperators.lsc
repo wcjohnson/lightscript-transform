@@ -1,0 +1,21 @@
+import t from '../types'
+import { placeAtNode as atNode } from 'ast-loc-utils'
+
+inlinedOperator = {
+  looseEq: (args) => t.binaryExpression("==", args[0], args[1])
+  looseNotEq: (args) => t.binaryExpression("!=", args[0], args[1])
+  bitwiseNot: (args) => t.unaryExpression("~", args[0])
+  bitwiseAnd: (args) => t.binaryExpression("&", args[0], args[1])
+  bitwiseOr: (args) => t.binaryExpression("|", args[0], args[1])
+  bitwiseXor: (args) => t.binaryExpression("^", args[0], args[1])
+  bitwiseLeftShift: (args) => t.binaryExpression("<<", args[0], args[1])
+  bitwiseRightShift: (args) => t.binaryExpression(">>", args[0], args[1])
+  bitwiseZeroFillRightShift: (args) => t.binaryExpression(">>>", args[0], args[1])
+}
+
+export maybeReplaceWithInlinedOperator(state, path) ->
+  { node } = path
+  if state.options.inlinedOperatorsEnabled() and node.callee.type == "Identifier":
+    name = node.callee.name
+    if inlinedOperator[name] and (not path.scope.hasBinding(name)):
+      path.replaceWith(inlinedOperator[name](node.arguments)~atNode(node))

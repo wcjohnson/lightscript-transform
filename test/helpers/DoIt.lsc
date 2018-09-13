@@ -1,0 +1,160 @@
+import { TestRun, Testable, TestOptions } from './TestRunner'
+import { allTests, TestFilter } from './TestFilter'
+import path from 'path'
+import fs from 'fs'
+import { transformSync } from '@babel/core'
+import thisPlugin from '../../lib'
+import diff from 'jest-diff'
+
+fixPlugins(opts) ->
+  if opts.plugins:
+    for idx i, elem e in opts.plugins:
+      if e == "@lightscript/transform":
+        opts.plugins[i] = thisPlugin
+      elif Array.isArray(e) and e[0] == "@lightscript/transform":
+        opts.plugins[i][0] = thisPlugin
+
+class CompilerTestOptions extends TestOptions:
+  inherits(other): void ->
+    if not other: return
+    for key k, val v in other:
+      match k:
+        | 'throws': null
+        | else: this[k] = v
+
+class CompilerTestable extends Testable:
+  loadTest(): void ->
+    this.loadTestData()
+    this.enqueueTest()
+
+  readTestOptions() ->
+    optionsData = this.readLocalArtifact("options.json", false)
+    options = if optionsData: JSON.parse(optionsData) else: {}
+    // Allow test options to be overridden
+    overrideData = this.readLocalArtifact("options.override.json", false)
+    if overrideData:
+      Object.assign(options, JSON.parse(overrideData))
+    options
+
+  loadTestData(): void ->
+    if this.name and this.name[0] == '.':
+      this.disabled = true
+      return
+
+    options = this.readTestOptions()
+    if options: this.options.assign(options)
+    fixPlugins(this.options)
+    //console.log("Test options:", this.title, this.options)
+
+    this.actual = this.readLocalArtifact("input", ['.js', '.lsc'])
+    this.expected = this.readLocalArtifact("output", ['.override.js', '.js'])
+
+    // Use parent input if no child input.
+    if (not this.actual) and (this.parent) and (this.parent.actual):
+      if not this.expected: this.expected = this.parent.expected
+      this.actual = this.parent.actual
+
+  enqueueTest(): void ->
+    if this.disabled:
+      if typeof(it) != 'undefined':
+        it.skip(this.title, => this.runTest())
+      else:
+        console.log("Skipped test:", this.title)
+    elif this.actual:
+      if typeof(it) != 'undefined':
+        it(this.title, => this.runTest())
+      else:
+        console.log("Ran test:", this.title)
+    else:
+      // console.log("skipping (no input)", this.title)
+      return
+
+  throwAnnotatedError(err): void ->
+    // Unnecessary because jest is good
+    // err.message = this.title + ": " + err.message
+    throw err
+
+  runTest(): void ->
+    let code, map
+    try {
+      now {code, map} = transformSync(this.actual, this.options)
+    } catch(err) {
+      if this.options.throws:
+        if err.message == this.options.throws:
+          return
+        elif process.env.SAVE_THROWS:
+          this.saveThrows(err)
+          this.throwAnnotatedError(err)
+        elif process.env.DUPLICATE_ON_FAILURE:
+          this.saveErrorOverride(this.options.throws)
+          this.throwAnnotatedError(err)
+        elif process.env.OVERRIDE_ON_FAILURE:
+          this.saveErrorOverride(err.message)
+          this.throwAnnotatedError(err)
+        else:
+          err.message = `Expected error message: ${this.options.throws}. Got error message: ${err.message}`
+          this.throwAnnotatedError(err)
+      elif (not this.expected) and (process.env.SAVE_THROWS):
+        this.saveThrows(err)
+
+      this.throwAnnotatedError(err)
+    }
+
+    if this.options.throws:
+      this.throwAnnotatedError(new Error(`Expected error message '${this.options.throws}' but no error was thrown.`))
+
+    now code = code.trim()
+
+    if ((not this.expected) or (process.env.FORCE_SAVE)) and (not this.options.throws) and (process.env.SAVE_EXPECTED):
+      this.saveExpected(code, "output.js")
+      return
+
+    if this.options.throws:
+      this.throwAnnotatedError(new Error(
+        "Expected error message: " + this.options.throws + ". But test succeeded."
+      ))
+    else:
+      if this.expected:
+        if code != this.expected:
+          this.mismatchExpected(this.expected, code)
+        else:
+          return undefined // Test succeeded
+      else:
+        this.throwAnnotatedError(new Error("Empty expected output -- use SAVE_EXPECTED=1 to create expected output."))
+
+  mismatchExpected(expected, received) ->
+    diffString = diff(expected, received, { expand: false })
+    if (process.env.OVERRIDE_ON_FAILURE) or (process.env.SAVE_OVERRIDE):
+      this.saveExpected(received, "output.override.js")
+      return
+    elif process.env.DUPLICATE_ON_FAILURE:
+      this.saveExpected(expected, "output.override.js")
+    elif process.env.UPDATE_EXPECTED:
+      this.saveExpected(received, "output.js")
+      return
+
+    this.throwAnnotatedError(new Error("Mismatch against expected output: " + diffString))
+
+  saveExpected(expected, filename): void ->
+    this.saveLocalArtifact(filename, expected)
+
+  saveErrorOverride(throws) ->
+    this.saveLocalArtifact("options.override.json", JSON.stringify({throws}))
+
+  saveThrows(err): void ->
+    const opts = this.readTestOptions() or {}
+    opts.throws = err.message
+    this.saveLocalArtifact("options.json", JSON.stringify(opts, null, "  "))
+
+run = new TestRun()
+run.getTestableConstructor() -> CompilerTestable
+run.getOptionsConstructor() -> CompilerTestOptions
+run.extensions = ['.js', '.lsc', '.lsx']
+
+filter = new TestFilter()
+if process.env.ONLY:
+  filter.only(process.env.ONLY)
+
+rootTestable = new CompilerTestable(run, null, filter)
+rootTestable.setTestPath(path.join(__dirname, '../fixtures'))
+rootTestable.readTestDirectory()

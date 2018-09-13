@@ -1,0 +1,38 @@
+import { checkImplicitConstShadowing } from '../helpers/variables'
+import { transformForInArrayStatement, transformForInObjectStatement, maybeTransformAutoConstDeclaration } from "../transforms/for"
+import { transformTildeCall, transformOptionalTildeCall } from '../transforms/tildeCalls'
+import { maybeReplaceWithInlinedOperator } from '../transforms/inlinedOperators'
+import { transformTryExpression, transformTryStatement } from "../transforms/try"
+
+export default mainPass(state, path): void ->
+  path.traverse({
+    LscForInArrayStatement(path): void ->
+      transformForInArrayStatement(path)
+
+    LscForInObjectStatement(path): void ->
+      transformForInObjectStatement(path);
+
+    LscTildeCallExpression(path): void ->
+      transformTildeCall(path)
+
+    LscOptionalTildeCallExpression(path): void ->
+      transformOptionalTildeCall(path)
+
+    CallExpression(path): void ->
+      maybeReplaceWithInlinedOperator(state, path)
+
+    ForOfStatement(path): void ->
+      maybeTransformAutoConstDeclaration(path)
+
+    ForInStatement(path): void ->
+      maybeTransformAutoConstDeclaration(path)
+
+    LscTryExpression(path): void ->
+      transformTryExpression(path)
+
+    TryStatement(path): void ->
+      transformTryStatement(path)
+
+    VariableDeclaration(path): void ->
+      checkImplicitConstShadowing(path)
+  })

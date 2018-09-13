@@ -1,0 +1,121 @@
+export compilerOptions = {
+  stdlib: {
+    description: "Configure the LightScript standard library"
+  }
+  patternMatching: {
+    description: "Test and branch using `match` keyword"
+    valueType: "option"
+    options: [false, "default"]
+    defaultValue: "default"
+    stage: "1"
+  }
+  bangCall: {
+    description: "Call functions with paren-free syntax using `!`"
+    valueType: "boolean"
+    defaultValue: true
+  }
+  useRequire: {
+    description: "Generate `require` rather than `import` when the compiler introduces a module."
+    valueType: "boolean"
+  }
+  flippedImports: {
+    description: "Allow imports via `import 'path': [specifier]` syntax."
+    valueType: "boolean"
+  }
+  placeholderArgs: {
+    description: "Specify arguments for a function using placeholders in the body."
+    valueType: "boolean"
+  }
+  placeholder: {
+    description: "Specify an identifier to be transformed into PlaceholderExpression."
+    valueType: "string"
+  }
+}
+
+getFileTypeInfo(filename) ->
+  if not filename: return { isLightScript: true, isLSX: false }
+
+  if filename.includes(".lsx"): return { isLightScript: true, isLSX: true }
+
+  if (
+    filename === "unknown" or // eslint
+    filename === "repl" or // babel-node
+    filename.includes(".lsc")
+  ): return { isLightScript: true, isLSX: false }
+
+  return { isLightScript: false, isLSX: false }
+
+addParserPlugin(plugins, plugin) ->
+  pluginName = if Array.isArray(plugin): plugin[0] else: plugin
+
+  for elem e in plugins:
+    if Array.isArray(e):
+      if e[0] == pluginName: return
+    else:
+      if e == pluginName: return
+
+  plugins.push(plugin)
+
+export class Options:
+  constructor(state) ->
+    this.state = state
+
+  setOptions(babelOpts, parserOpts, lscOpts): void ->
+    this.babelOpts = babelOpts
+    this.parserOpts = parserOpts
+    this.lscOpts = lscOpts or {}
+
+    this.fileTypeInfo = getFileTypeInfo(babelOpts.filename)
+
+    // Attempt to determine if the input is LightScript
+    if this.fileTypeInfo.isLightScript and (lscOpts.isLightScript == undefined):
+      this.isLightScript = true
+    else:
+      this.isLightScript = false
+
+  setPreParseOptions(parserOpts, configurationDirectives): void ->
+    this.parserOpts = parserOpts
+
+    // Merge config directives into lsc options
+    this.configurationDirectives = configurationDirectives
+    if configurationDirectives.isLightScript: this.isLightScript = true
+    Object.assign(this.lscOpts, this.configurationDirectives)
+
+  getParserOptions() ->
+    pluginOpts = this.lscOpts or {}
+
+    opts = Object.assign({}, this.parserOpts)
+    delete opts.lscCompiler // not needed in parser
+    opts.plugins = (opts.plugins or []).slice()
+    plugins = opts.plugins
+
+    plugins~addParserPlugin("objectRestSpread")
+    plugins~addParserPlugin("asyncGenerators")
+    plugins~addParserPlugin("classProperties")
+    plugins~addParserPlugin("optionalCatchBinding")
+    plugins~addParserPlugin("optionalChaining")
+    plugins~addParserPlugin("decorators-legacy")
+
+    // Mandatory LightScript plugins
+    plugins.push(
+      "tryCatch", "tildeCall", "disableBitwiseOperators"
+      "significantWhitespace", "modifiedLogicalOperators", "seqExprRequiresParen",
+      "lscCoreSyntax", "lscIf", "lscIfExpression", "lscTryExpression"
+      "lscAssignment", "lscArrows", "lscForIn", "awaitArrow", "spreadLoop"
+      "questionSubscripts", "match"
+    )
+
+    // Optional plugins
+    if not pluginOpts.disableJsx: plugins~addParserPlugin("jsx")
+    if not pluginOpts.disableFlow: plugins~addParserPlugin("flow")
+    if pluginOpts.bangCall != false: plugins.push("bangCall")
+    if pluginOpts.flippedImports: plugins.push("flippedImports")
+    if pluginOpts.placeholderArgs: plugins.push("syntacticPlaceholder")
+    if pluginOpts.placeholder:
+      opts.placeholder = pluginOpts.placeholder
+
+    opts
+
+  inlinedOperatorsEnabled() ->
+    opts = this.lscOpts
+    not ((opts.stdlib === false) or (typeof opts.stdlib === "object" && opts.stdlib.lightscript === false))
