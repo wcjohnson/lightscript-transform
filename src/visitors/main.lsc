@@ -5,9 +5,23 @@ import { maybeReplaceWithInlinedOperator } from '../transforms/inlinedOperators'
 import { transformTryExpression, transformTryStatement } from "../transforms/try"
 import { transformNamedArrowFunction, transformNamedArrowMemberExpression, transformArrowFunctionExpression } from "../transforms/arrows"
 import { transformClassBody } from "../transforms/classes"
+import { maybeTransformArrayWithSpreadLoops, maybeTransformObjectWithSpreadLoops, maybeTransformJSXExpressionWithSpreadLoop, transformSpreadElement } from "../transforms/spreadLoops"
 
 export default mainPass(state, path): void ->
   path.traverse({
+    JSXExpressionContainer(path): void ->
+      maybeTransformJSXExpressionWithSpreadLoop(path)
+
+    ArrayExpression(path): void ->
+      maybeTransformArrayWithSpreadLoops(path)
+
+    ObjectExpression(path): void ->
+      // ObjectExpression may get replaced with an IIFE here.
+      if maybeTransformObjectWithSpreadLoops(path): path.resync()
+
+    SpreadElement(path): void ->
+      transformSpreadElement(path)
+
     LscNamedArrowFunction(path): void ->
       transformNamedArrowFunction(path)
 

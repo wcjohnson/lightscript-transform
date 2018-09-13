@@ -31,3 +31,9 @@ x.a() => b
 class A extends B:
   static f() => x
   g() => x
+
+[...for elem e in arr: [e]]
+
+{...for elem e in arr: {[e]: "hi"}}
+
+[...if flag: val]

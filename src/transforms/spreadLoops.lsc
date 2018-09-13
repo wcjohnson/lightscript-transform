@@ -1,12 +1,13 @@
 import t, { isa } from '../types'
 import { transformTails } from '../helpers/tails'
 import { toStatement } from '../helpers/blocks'
+import { hoistRef } from '../helpers/variables'
 
 import { getLoc, placeAtLoc as atLoc, placeAtNode as atNode, getSurroundingLoc, span, placeTreeAtLocWhenUnplaced as allAtLoc } from 'ast-loc-utils'
 
 export isSpreadLoopContainer(node) ->
-  (node~isa("SpreadElement") or node~isa("SpreadProperty")) and
-  node.argument~isa("SpreadLoop")
+  node~isa("SpreadElement") and
+  node.argument~isa("LscSpreadLoop")
 
 // prevent generated spreadexpr from being further transformed
 safe(node) ->
@@ -88,7 +89,7 @@ export transformJSXComprehension(exprPath): void ->
   )
 
 export maybeTransformJSXExpressionWithSpreadLoop(path) ->
-  if path.node.expression~isa("SpreadLoop"):
+  if path.node.expression~isa("LscSpreadLoop"):
     transformJSXComprehension(path.get("expression"))
     true
   else:
@@ -227,3 +228,47 @@ export maybeTransformArrayWithSpreadLoops(path) ->
       return true
 
   false
+
+export transformSafeSpreadElement(path) ->
+  // Prevent infinite recursion
+  if path.node._safe: return
+
+  { node: { argument } } = path
+  // Optimization: if the thing being spread is already an array, elide
+  if argument~isa("ArrayExpression"):
+    path.node._safe = true
+    return
+
+  // Optimization: if spreading an `IfExpr` without an alternate, just add
+  // `[]` as an alternate if consequent is an array
+  if (
+    argument~isa("IfExpression") and
+    argument.consequent~isa("ArrayExpression") and
+    (not argument.alternate)
+  ):
+    argument.alternate = t.arrayExpression()
+    path.get("argument").replaceWith(argument)
+    path.node._safe = true
+    return
+
+  { ref, assign, isComplex } = hoistRef(path, path.node.argument, "ref")
+
+  cond = t.conditionalExpression(
+    t.binaryExpression("===", ref, t.unaryExpression("void", t.numericLiteral(0)))
+    t.arrayExpression(),
+    ref
+  )
+
+  nextNode = t.spreadElement(
+    if isComplex:
+      t.sequenceExpression([assign, cond])
+    else:
+      cond
+  )~allAtLoc(path.node~getLoc!)
+
+  nextNode._safe = true
+  path.replaceWith! nextNode
+
+export transformSpreadElement(path) ->
+  // TODO: Verify that this is a SpreadElement in an Array or CallExpr
+  transformSafeSpreadElement(path)
