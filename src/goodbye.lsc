@@ -1,9 +1,0 @@
-export goodbye() -> "goodbye"
-
-decorator(x) -> x
-
-fieldDecorator(target, prop, desc) -> desc
-
-@decorator
-export class GoodbyeWorld:
-  @fieldDecorator decorated(x) -> x
