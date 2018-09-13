@@ -152,7 +152,7 @@ export registerLightscriptNodeTypes(t): void ->
         "Pureish",
         "Declaration",
         "FunctionDeclaration",
-        "NamedArrowFunction",
+        "LscNamedArrowFunction",
       ],
       fields: {  // DUP in NamedArrowMemberExpression
         id: {
@@ -192,7 +192,7 @@ export registerLightscriptNodeTypes(t): void ->
         "FunctionParent",
         "Expression",
         "Pureish",
-        "NamedArrowFunction",
+        "LscNamedArrowFunction",
       ],
     });
 

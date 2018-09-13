@@ -3,9 +3,23 @@ import { transformForInArrayStatement, transformForInObjectStatement, maybeTrans
 import { transformTildeCall, transformOptionalTildeCall } from '../transforms/tildeCalls'
 import { maybeReplaceWithInlinedOperator } from '../transforms/inlinedOperators'
 import { transformTryExpression, transformTryStatement } from "../transforms/try"
+import { transformNamedArrowFunction, transformNamedArrowMemberExpression, transformArrowFunctionExpression } from "../transforms/arrows"
+import { transformClassBody } from "../transforms/classes"
 
 export default mainPass(state, path): void ->
   path.traverse({
+    LscNamedArrowFunction(path): void ->
+      transformNamedArrowFunction(path)
+
+    LscNamedArrowMemberExpression(path): void ->
+      transformNamedArrowMemberExpression(path)
+
+    ArrowFunctionExpression(path): void ->
+      transformArrowFunctionExpression(path)
+
+    ClassBody(path): void ->
+      transformClassBody(path)
+
     LscForInArrayStatement(path): void ->
       transformForInArrayStatement(path)
 

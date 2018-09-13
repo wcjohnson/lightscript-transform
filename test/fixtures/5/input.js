@@ -18,3 +18,16 @@ x = try: y
 x2 = try: y catch err: err
 
 looseEq?(a, b)
+
+a1() -> b
+
+a2() => b
+
+x.a() => b
+
+-> x
+=> x
+
+class A extends B:
+  static f() => x
+  g() => x

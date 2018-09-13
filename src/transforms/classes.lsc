@@ -80,7 +80,7 @@ export bindMethodsInConstructor(classPath, constructorPath, methodIds) ->
 
     thisDotMethod = t.memberExpression(t.thisExpression(), methodId, isComputed)
 
-    t.expressionStatement(
+    [t.expressionStatement(
       t.assignmentExpression("="
         thisDotMethod
         t.callExpression(
@@ -88,7 +88,7 @@ export bindMethodsInConstructor(classPath, constructorPath, methodIds) ->
           [t.thisExpression()]
         )
       )
-    )
+    )]
   ]
 
   // directly after each instance of super(), insert the thingies there.
@@ -152,4 +152,43 @@ export bindMethods(path, methodIds) ->
     path.getStatementParent().insertAfter(
       assignments.map((a) => t.expressionStatement(a))
     );
+  }
+
+// Examine class body and retrieve info needed to transform it
+enumerateClassBody(path) ->
+  fatArrows = []
+  fatStaticArrows = []
+  let constructorPath = null
+  body = path.node.body
+
+  body.forEach((method, i) => {
+    if (!t.isMethod(method)) return;
+
+    if (method.kind === "constructor") {
+      now constructorPath = path.get(`body.${i}.body`);
+    } else if (method.static && method.skinny === false) {
+      fatStaticArrows.push(method.key);
+      method.skinny = true; // prevent infinite recursion
+    } else if (method.skinny === false) {
+      fatArrows.push(method.key);
+      method.skinny = true; // prevent infinite recursion
+    }
+  });
+
+  { fatArrows, fatStaticArrows, constructorPath }
+
+export transformClassBody(path): void ->
+  let { fatArrows, fatStaticArrows, constructorPath } = enumerateClassBody(path)
+
+  let maybeAddSuper = path.parentPath.node.superClass && constructorPath;
+  if (fatArrows.length || maybeAddSuper) {
+    now constructorPath = ensureConstructor(path.parentPath, constructorPath, true);
+  }
+
+  if (fatArrows.length) {
+    bindMethodsInConstructor(path.parentPath, constructorPath, fatArrows);
+  }
+
+  if (fatStaticArrows.length) {
+    bindMethods(path.parentPath, fatStaticArrows);
   }

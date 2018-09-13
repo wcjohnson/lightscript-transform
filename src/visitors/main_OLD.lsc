@@ -25,40 +25,6 @@ export default mainPass(compilerState, programPath): void ->
   // Main LSC transforms
   programPath.traverse({
 
-    NamedArrowFunction(path): void ->
-      if (path.node.skinny):
-        replaceWithPlainFunction(path)
-      elif (path.node.generator):
-        // there are no arrow-generators in ES6, so can't compile to arrow
-        replaceWithBoundFunction(path)
-      else:
-        replaceWithArrowFunction(path)
-
-    NamedArrowMemberExpression(path): void ->
-      let object = path.node.object
-      let node = path.node
-      delete node.object
-      node.type = "NamedArrowExpression"
-
-      if (!node.skinny) {
-        node.skinny = true;  // binding here, don't turn into arrow
-        now node = t.callExpression(
-          t.memberExpression(node, t.identifier("bind")),
-          [object]
-        )~allAtLoc(getLoc(object))
-      }
-
-      path.replaceWith(t.assignmentExpression("=",
-        t.memberExpression(object, path.node.id)~atLoc(getSurroundingLoc([object, path.node.id]))
-        node
-      )~atNode(node))
-
-    ArrowFunctionExpression(path): void ->
-      if (path.node.skinny):
-        replaceWithPlainFunction(path)
-      elif (path.node.generator):
-        replaceWithBoundFunction(path)
-
     ClassBody(path): void ->
       let fatArrows = [], fatStaticArrows = [], constructorPath;
       path.node.body.forEach((method, i) => {

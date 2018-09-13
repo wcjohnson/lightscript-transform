@@ -15,13 +15,13 @@ maybeToRestructureExpression(node) ->
 
 export toRestructureExpressionForArrayPattern(pattern) ->
   t.arrayExpression(
-    [...for elem element in pattern.elements:
+    [...for elem element in pattern.elements: [
       match element:
         | ~isa("AssignmentPattern"): element.left~maybeToRestructureExpression()
         | ~isa("RestElement"): t.spreadElement(element.argument)~atNode(element)
         | ~isDestructuringPattern(): element~toRestructureExpression()
         | else: element
-    ]
+    ]]
   )~atNode(pattern)
 
 restructureObjAssignment(assign, defaultKey) ->
@@ -32,7 +32,7 @@ restructureObjAssignment(assign, defaultKey) ->
 
 export toRestructureExpressionForObjectPattern(pattern) ->
   t.objectExpression(
-    [...for elem property in pattern.properties:
+    [...for elem property in pattern.properties: [
       match property:
         | ~isa("RestElement"):
           t.spreadElement(property.argument)~atNode(property)
@@ -45,5 +45,5 @@ export toRestructureExpressionForObjectPattern(pattern) ->
           value~restructureObjAssignment(key)~atNode(property)
         | as {value} if value~isa("Identifier"):
           t.objectProperty(value, value, false, true)~atNode(property)
-    ]
+    ]]
   )~atNode(pattern)

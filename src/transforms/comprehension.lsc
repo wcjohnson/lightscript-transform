@@ -132,7 +132,7 @@ transformObjectWithSpreadLoops(path, spreadLoopPaths, plainProps): void ->
   path.replaceWith! iife(
     [...for elem p in spreadLoopPaths:
       transformObjectComprehensionTails(p, ref)
-      p.node
+      [p.node]
     ]
     ref
     t.objectExpression(plainProps)~atLoc(plainProps~getSurroundingLoc!)

@@ -15,24 +15,25 @@ export addImport(imports, importPath, name) ->
 export insertImports(imports, path, useRequire = false) ->
   loc = getCompilerState().firstLoc
 
+  // XXX: refactor - generateREquireStatement, generateImportStatement
   stmts = [...for key importPath, val importNames in imports:
     for elem name in importNames:
       if useRequire:
         // const [name] = require("[path]")
-        t.variableDeclaration("const", [
+        [t.variableDeclaration("const", [
           t.variableDeclarator(
             t.identifier(name)
             t.callExpression(t.identifier("require"), [
               t.stringLiteral(importPath)
             ])
           )
-        ])~allAtLoc(loc)
+        ])~allAtLoc(loc)]
       else:
         // import [name] from "[path]"
-        t.importDeclaration(
+        [t.importDeclaration(
           [t.importDefaultSpecifier(t.identifier(name))]
           t.stringLiteral(importPath)
-        )~allAtLoc(loc)
+        )~allAtLoc(loc)]
   ]
 
   if stmts.length > 0: path.unshiftContainer("body", stmts)

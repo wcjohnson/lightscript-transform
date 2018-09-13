@@ -45,7 +45,7 @@ export getShadowingIdentifiers(declarationPath) ->
 
   [...for idx i in declarationPath.node.declarations:
     for val id in declarationPath.get(`declarations.${i}`).getBindingIdentifiers():
-      if declarationPath.scope.parent.hasBinding(id.name): id
+      if declarationPath.scope.parent.hasBinding(id.name): [id]
   ]
 
 // Check for shadowed implicit-const variables
@@ -116,7 +116,7 @@ export spreadIsAlreadySafe(spread) ->
 export restToSpread(argList) ->
   [...for elem arg in argList:
     if arg~isa("RestElement"):
-      t.spreadElement(arg.argument)~atNode(arg)~spreadIsAlreadySafe!
+      [t.spreadElement(arg.argument)~atNode(arg)~spreadIsAlreadySafe!]
     else:
-      arg
+      [arg]
   ]
