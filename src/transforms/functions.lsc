@@ -1,5 +1,6 @@
 import { isa } from "../types"
 import { addImplicitReturns } from "../helpers/functions"
+import { getScopeParent } from "../helpers/blocks"
 
 export enterFunction(path): void ->
   if path.node~isa("FunctionDeclaration"):
@@ -7,7 +8,8 @@ export enterFunction(path): void ->
     // Lightscript and therefore not acknowledged by Babel's default
     // traversal algorithm for assessing declarations. We must
     // register the declaration by hand here.
-    path.getFunctionParent().scope.registerDeclaration(path)
+    scopeParent = getScopeParent(path)
+    scopeParent.scope.registerDeclaration(path)
 
 export exitFunction(path): void ->
   addImplicitReturns(path)
