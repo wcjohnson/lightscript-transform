@@ -1,0 +1,9 @@
+import t, { isa } from "../types"
+
+export transformAwaitExpression(path): void ->
+  if (path.get("argument")~isa("ArrayExpression")):
+    promiseDotAllCall = t.callExpression(
+      t.memberExpression(t.identifier("Promise"), t.identifier("all")),
+      [path.node.argument],
+    );
+    path.get("argument").replaceWith(promiseDotAllCall);

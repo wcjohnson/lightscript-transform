@@ -6,9 +6,27 @@ import { transformTryExpression, transformTryStatement } from "../transforms/try
 import { transformNamedArrowFunction, transformNamedArrowMemberExpression, transformArrowFunctionExpression } from "../transforms/arrows"
 import { transformClassBody } from "../transforms/classes"
 import { maybeTransformArrayWithSpreadLoops, maybeTransformObjectWithSpreadLoops, maybeTransformJSXExpressionWithSpreadLoop, transformSpreadElement } from "../transforms/spreadLoops"
+import { transformIfExpression } from "../transforms/if"
+import { enterFunction, exitFunction } from "../transforms/functions"
+import { transformAssignmentExpression } from "../transforms/assignments"
+import { transformAwaitExpression } from "../transforms/await"
 
 export default mainPass(state, path): void ->
   path.traverse({
+    Function: {
+      enter(path): void -> enterFunction(path)
+      exit(path): void -> exitFunction(path)
+    }
+
+    AwaitExpression(path): void ->
+      transformAwaitExpression(path)
+
+    AssignmentExpression(path): void ->
+      transformAssignmentExpression(path)
+
+    LscIfExpression(path): void ->
+      transformIfExpression(path)
+
     JSXExpressionContainer(path): void ->
       maybeTransformJSXExpressionWithSpreadLoop(path)
 

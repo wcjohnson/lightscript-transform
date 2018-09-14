@@ -1,8 +1,8 @@
 import t from '../types'
 
-isIndexedPlaceholderPath(phPath) -> phPath.node.index?
+isIndexedPlaceholderPath(phPath) -> !!phPath.node.index
 isSpreadPlaceholderPath(phPath) -> phPath.parentPath?.node.type == "SpreadElement"
-isNonIndexedPlaceholderPath(phPath) -> (not phPath.node.index?) and (not phPath~isSpreadPlaceholderPath())
+isNonIndexedPlaceholderPath(phPath) -> (not phPath.node.index) and (not phPath~isSpreadPlaceholderPath())
 
 registerPlaceholder(functions, path, programPath) ->
   fnPath = path.getFunctionParent()
@@ -13,7 +13,7 @@ registerPlaceholder(functions, path, programPath) ->
     throw path.buildCodeFrameError("Placeholders cannot be used in functions with arguments.")
 
   if path.parentPath?.node?.type == "SpreadElement":
-    if path.node?.index?:
+    if path.node?.index:
       throw path.buildCodeFrameError("Cannot use indices with spread placeholders.")
 
   let fnInfo = functions.get(fnPath)

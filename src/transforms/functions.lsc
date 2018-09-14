@@ -1,0 +1,13 @@
+import { isa } from "../types"
+import { addImplicitReturns } from "../helpers/functions"
+
+export enterFunction(path): void ->
+  if path.node~isa("FunctionDeclaration"):
+    // This is needed because named arrow declarations are new in
+    // Lightscript and therefore not acknowledged by Babel's default
+    // traversal algorithm for assessing declarations. We must
+    // register the declaration by hand here.
+    path.getFunctionParent().scope.registerDeclaration(path)
+
+export exitFunction(path): void ->
+  addImplicitReturns(path)

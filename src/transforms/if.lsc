@@ -1,0 +1,15 @@
+import { blockToExpression } from "../helpers/blocks"
+import { placeAtNode as atNode } from 'ast-loc-utils'
+import t from "../types"
+
+export transformIfExpression(path) ->
+  // TODO: better source mapping here -- place implicit null at end of consequent?
+  consequent = blockToExpression(path.get("consequent"));
+  undef = path.scope.buildUndefinedNode();
+
+  alternate = if path.node.alternate:
+    blockToExpression(path.get("alternate"));
+  else:
+    undef~atNode(path.node)
+
+  path.replaceWith(t.conditionalExpression(path.node.test, consequent, alternate)~atNode(path.node));

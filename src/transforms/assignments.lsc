@@ -1,0 +1,16 @@
+import { isa } from "../types"
+
+export transformAssignmentExpression(path): void ->
+  { node } = path
+
+  // Transform await arrows to ordinary assignment
+  if (node.operator === "<-"): node.operator = "="
+
+  // Don't enforce `now` with MemberExprs
+  if path.node.left~isa("MemberExpression"): return
+
+  // Enforce `now` with all other assignments
+  if path.node.isNowAssign === false:
+    throw path.buildCodeFrameError(
+      "Incorrect assignment: to reassign, use `now`; to assign as `const`, put on its own line."
+    )
