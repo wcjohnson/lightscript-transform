@@ -108,6 +108,10 @@ let CompilerTestable = class CompilerTestable extends _TestRunner.Testable {
       } else {
         console.log("Ran test:", this.title);
       }
+    } else if (this.exec) {
+      if (typeof it !== 'undefined') {
+        it(this.title, () => this.runExecTest());
+      }
     } else {
       // console.log("skipping (no input)", this.title)
       return;
