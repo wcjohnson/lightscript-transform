@@ -1,9 +1,12 @@
 async function fn() {
-  const x = await (async () => {
-    try {
-      return await fetch();
-    } catch (_err) {
-      return _err;
-    }
-  })();return x + 1;
+  let _val;
+
+  try {
+    _val = await fetch();
+  } catch (_err) {
+    _val = _err;
+  }
+
+  const x = _val;
+  return x + 1;
 }

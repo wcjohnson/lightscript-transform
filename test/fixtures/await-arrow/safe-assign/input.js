@@ -1,3 +1,3 @@
 fn() -/>
-  x <!- fetch()
+  x = try: <- fetch()
   x + 1

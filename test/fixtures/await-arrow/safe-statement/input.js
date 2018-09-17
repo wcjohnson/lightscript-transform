@@ -1,2 +1,2 @@
 fn() -/>
-  <!- fetch()
+  try: <- fetch()
