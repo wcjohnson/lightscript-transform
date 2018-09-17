@@ -9,7 +9,10 @@ class A extends B {
       this.f = this.f.bind(this);
       bar();
     }
-  }f() {
+  }
+
+  f() {
     return this;
   }
+
 }

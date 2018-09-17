@@ -7,4 +7,5 @@ class A {
     1;
     return 2;
   }
+
 }

@@ -6,4 +6,5 @@ class A {
   *f() {
     return yield this;
   }
+
 }

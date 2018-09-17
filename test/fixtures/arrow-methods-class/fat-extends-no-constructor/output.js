@@ -7,4 +7,5 @@ class A extends B {
   f() {
     return this;
   }
+
 }
