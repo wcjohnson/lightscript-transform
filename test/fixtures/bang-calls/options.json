@@ -1,10 +1,8 @@
 {
   "plugins": [
-    ["lightscript", {
+    ["@lightscript/transform", {
       "isLightScript": true,
-      "bangCall": true,
-      "safeCall": true
+      "bangCall": true
     }]
   ]
 }
-

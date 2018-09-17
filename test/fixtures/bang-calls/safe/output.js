@@ -1,1 +1,1 @@
-typeof a !== "function" ? void 0 : a(b, c);
+a?.(b, c);
