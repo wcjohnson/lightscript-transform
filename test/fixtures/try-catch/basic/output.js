@@ -1,11 +1,15 @@
-import _isMatch from "@oigroup/lightscript-runtime/isMatch";
+import _isMatch from "@lightscript/runtime/isMatch";
+
 let _val;
 
 try {
   _val = b();
 } catch (err) {
   _val = panic();
-}const a = _val;
+}
+
+const a = _val;
+
 let _val2;
 
 try {
@@ -16,7 +20,10 @@ try {
   } else if (_isMatch(Error, err)) {
     _val2 = generalValue;
   }
-}const c = _val2;
+}
+
+const c = _val2;
+
 let _val3;
 
 try {
@@ -28,4 +35,5 @@ try {
     _val3 = generalValue;
   }
 }
+
 const e = _val3;

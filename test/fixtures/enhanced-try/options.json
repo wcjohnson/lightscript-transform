@@ -1,9 +1,0 @@
-{
-  "plugins": [
-    ["lightscript", {
-      "isLightScript": true,
-      "enhancedTry": true
-    }]
-  ]
-}
-

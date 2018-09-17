@@ -1,4 +1,4 @@
-f(try g())
+f(try: g())
 
 try:
   something()
