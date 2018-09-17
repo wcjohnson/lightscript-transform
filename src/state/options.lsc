@@ -95,6 +95,7 @@ export class Options:
     plugins~addParserPlugin("optionalCatchBinding")
     plugins~addParserPlugin("optionalChaining")
     plugins~addParserPlugin("decorators-legacy")
+    plugins~addParserPlugin("throwExpressions")
 
     // Mandatory LightScript plugins
     plugins.push(
