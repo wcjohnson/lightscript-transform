@@ -1,18 +1,26 @@
 const f = function () {
   return;
-};const g = function () {
+};
+
+const g = function () {
   return function () {
     return 1;
   };
-};const h = f(function () {
+};
+
+const h = f(function () {
   return;
 });
 
 const i = () => {
   return;
-};const j = function () {
+};
+
+const j = function () {
   return () => 1;
-};const k = f(function () {
+};
+
+const k = f(function () {
   return;
 }, () => function () {
   return;

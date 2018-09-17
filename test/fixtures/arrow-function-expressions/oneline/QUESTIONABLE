@@ -1,0 +1,1 @@
+Babel-generator bug is causing `thrownew` to be generated instead of `throw new`
