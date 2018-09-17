@@ -15,28 +15,5 @@ export default LightScript(babel) ->
       Program(path, state): void ->
         compilerState = state.file.opts.lscCompiler
         compilerState.visitProgram(path, state)
-
-        // // Skip non-LightScript code
-        // if not state.file.isLightScript: return
-
-        // // Obtain compiler state created during early processing
-        // compiler = state.file.lscCompiler
-
-        // ////////// Initialize compilation run
-        // compiler~preCompileInitialization(path)
-
-        // ////////// AST visitation and transformation
-        // // First pass: Perform basic ast fixups (block bodies, etc)
-        // compiler~firstPass(path)
-        // // Second pass: placeholders, comprehensions
-        // compiler~secondPass(path)
-        // // Third pass: transform optional chains
-        // compiler~thirdPass(path)
-        // // Main ast visitor
-        // compiler~mainPass(path)
-
-        // ////////// Post-processing
-        // // Fix up loose ends like adding `import` statements
-        // compiler~postprocess()
     }
   }
