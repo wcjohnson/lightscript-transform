@@ -29,7 +29,7 @@ export class Imports:
     this.useRequire = false
 
   initialize() ->
-    { babelOpts: opts } = this.options
+    { lscOpts: opts } = this.options
 
     if typeof(opts.stdlib) == "object":
       if opts.stdlib.lodash != false:
