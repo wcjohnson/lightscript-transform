@@ -122,7 +122,7 @@ transformMatchCase(mtch, casePath) ->
   c = casePath.node
   {
     consequent: mtch~transformMatchConsequent(casePath)
-    test: if c.outerGuard?.type != "MatchElse": mtch~transformMatchTest(casePath)
+    test: if c.outerGuard?.type != "LscMatchElse": mtch~transformMatchTest(casePath)
   }
 
 export transformMatchCases(mtch, [casePath, ...rest]) ->
