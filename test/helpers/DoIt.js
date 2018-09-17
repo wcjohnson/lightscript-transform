@@ -110,7 +110,7 @@ let CompilerTestable = class CompilerTestable extends _TestRunner.Testable {
       }({ code, map } = (0, _core.transformSync)(this.actual, realOpts));
     } catch (err) {
       if (this.options.throws) {
-        if (err.message === this.options.throws) {
+        if (err.message.indexOf(this.options.throws) > -1) {
           return;
         } else if (process.env.SAVE_THROWS) {
           this.saveThrows(err);
@@ -122,7 +122,7 @@ let CompilerTestable = class CompilerTestable extends _TestRunner.Testable {
           this.saveErrorOverride(err.message);
           this.throwAnnotatedError(err);
         } else {
-          err.message = `Expected error message: ${this.options.throws}. Got error message: ${err.message}`;
+          err.message = `Expected error message: '${this.options.throws}'. Got error message: '${err.message}'`;
           this.throwAnnotatedError(err);
         }
       } else if (!this.expected && process.env.SAVE_THROWS) {

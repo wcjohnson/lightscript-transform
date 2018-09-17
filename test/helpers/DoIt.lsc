@@ -87,7 +87,7 @@ class CompilerTestable extends Testable:
       now {code, map} = transformSync(this.actual, realOpts)
     } catch(err) {
       if this.options.throws:
-        if err.message == this.options.throws:
+        if err.message.indexOf(this.options.throws) > -1:
           return
         elif process.env.SAVE_THROWS:
           this.saveThrows(err)
@@ -99,7 +99,7 @@ class CompilerTestable extends Testable:
           this.saveErrorOverride(err.message)
           this.throwAnnotatedError(err)
         else:
-          err.message = `Expected error message: ${this.options.throws}. Got error message: ${err.message}`
+          err.message = `Expected error message: '${this.options.throws}'. Got error message: '${err.message}'`
           this.throwAnnotatedError(err)
       elif (not this.expected) and (process.env.SAVE_THROWS):
         this.saveThrows(err)
