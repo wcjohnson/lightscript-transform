@@ -25,24 +25,7 @@ export default mainPass(compilerState, programPath): void ->
   // Main LSC transforms
   programPath.traverse({
 
-    AwaitExpression(path): void ->
-      if (path.get("argument")~isa("ArrayExpression")):
-        promiseDotAllCall = t.callExpression(
-          t.memberExpression(t.identifier("Promise"), t.identifier("all")),
-          [path.node.argument],
-        );
-        path.get("argument").replaceWith(promiseDotAllCall);
-
-    // collect functions to be imported for the stdlib
-    ReferencedIdentifier(path): void ->
-      if not checkFalsePositiveReference(path):
-        compilerState.stdlib~markIdentifier(path)
 
 
-    LscMatchExpression(path): void ->
-      transformMatchExpression(path)
-
-    LscMatchStatement(path): void ->
-      transformMatchStatement(path)
 
   })

@@ -33,7 +33,7 @@ HasLength(array, min, max, patternNode) ->
     [
       array
       t.numericLiteral(min)~atNode(patternNode)
-      ...if max~looseNotEq(null): t.numericLiteral(max)~atNode(patternNode)
+      ...if max~looseNotEq(null): [t.numericLiteral(max)~atNode(patternNode)]
     ]
   )~atNode(patternNode)
 
@@ -90,15 +90,14 @@ export matchesObjectPattern(obj, objectPattern) ->
     ...for elem property in properties:
       if property~isa("ObjectProperty"):
         { key, value } = property
-        [match value:
+        match value:
           | as {type, left} if type == "AssignmentPattern" and left~isDestructuringPattern():
-            Or(
+            [Or(
               Not(key~In(obj))
               obj~Dot(key)~matchesDestructuringPattern(left)
-            )
+            )]
           | ~isDestructuringPattern():
-            obj~Dot(key)~matchesDestructuringPattern(value)
-        ]
+            [obj~Dot(key)~matchesDestructuringPattern(value)]
   ])
 
 ////////// Generate accessor expressions for destructuring patterns

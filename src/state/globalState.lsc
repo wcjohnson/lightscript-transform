@@ -1,0 +1,6 @@
+let globalState = null
+
+export setGlobalState(st) ->
+  now globalState = st
+
+export getGlobalState() -> globalState

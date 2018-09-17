@@ -3,7 +3,9 @@ import parseConfigurationDirectives from './util/parseConfigurationDirectives'
 import patch from './util/babelTypesPatch'
 import { registerLightscriptNodeTypes } from './lscNodeTypes'
 
-import { Options } from './options'
+import { Options } from './state/options'
+import { Imports } from './state/imports'
+import { setGlobalState } from './state/globalState'
 
 import { parse } from '@lightscript/parser'
 
@@ -13,6 +15,7 @@ export class CompilerState:
   constructor(babel) ->
     this.babel = babel
     this.options = new Options(this)
+    this.imports = new Imports(this, this.options)
 
   debugDump() ->
     rst = Object.assign({}, this)
@@ -48,9 +51,18 @@ export class CompilerState:
     // Only transform LightScript files.
     if not this.isLightScript(): return
 
+    // Initialize the state vector
+    this.programPath = path
+    this.imports.initialize()
+    setGlobalState(this)
+
     // Patch the relevant instance of babel-types
     { babel } = this
     patch(babel.types)
     registerLightscriptNodeTypes(babel.types)
 
+    // Execute compiler passes
     mainPass(this, path)
+
+    // Add implicit imports
+    this.imports.insertImports(path)

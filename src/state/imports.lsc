@@ -1,39 +1,403 @@
 import t from '../types'
-import { getCompilerState } from './compilerState'
-
 import { placeTreeAtLocWhenUnplaced as allAtLoc } from 'ast-loc-utils'
+import { getScopeParent } from "../helpers/blocks"
+import { checkFalsePositiveReference } from "../helpers/variables"
 
-export createImports() ->
-  {}
+buildRequireStatement(name, importPath) ->
+  // const [name] = require("[path]")
+  t.variableDeclaration("const", [
+    t.variableDeclarator(
+      t.identifier(name)
+      t.callExpression(t.identifier("require"), [
+        t.stringLiteral(importPath)
+      ])
+    )
+  ])
 
-// import id from 'importPath'
-export addImport(imports, importPath, name) ->
-  if typeof importPath !== "string": return
-  if not imports[importPath]: imports[importPath] = []
-  if imports[importPath].indexOf(name) < 0: imports[importPath].push(name)
+buildImportStatement(name, importPath) ->
+  t.importDeclaration(
+    [t.importDefaultSpecifier(t.identifier(name))]
+    t.stringLiteral(importPath)
+  )
 
-export insertImports(imports, path, useRequire = false) ->
-  loc = getCompilerState().firstLoc
+export class Imports:
+  constructor(state, options) ->
+    this.state = state
+    this.options = options
+    this.symbols = {}
+    this.defaultImports = {}
+    this.useRequire = false
 
-  // XXX: refactor - generateREquireStatement, generateImportStatement
-  stmts = [...for key importPath, val importNames in imports:
-    for elem name in importNames:
-      if useRequire:
-        // const [name] = require("[path]")
-        [t.variableDeclaration("const", [
-          t.variableDeclarator(
-            t.identifier(name)
-            t.callExpression(t.identifier("require"), [
-              t.stringLiteral(importPath)
-            ])
-          )
-        ])~allAtLoc(loc)]
+  initialize() ->
+    { babelOpts: opts } = this.options
+
+    if typeof(opts.stdlib) == "object":
+      if opts.stdlib.lodash != false:
+        this.loadLodashSymbols()
+    else:
+      if opts.stdlib != false:
+        this.loadLodashSymbols()
+
+    if opts.useRequire == true: this.useRequire = true
+
+  loadLodashSymbols() ->
+    for elem methodName in everyLodashMethod:
+      this.symbols[methodName] = `lodash/${methodName}`
+
+  maybeProcessStdlibIdentifier(path) ->
+    // Early-out if false positive reference.
+    // XXX: Check if this is still needed under Babel 7
+    if checkFalsePositiveReference(path): return
+
+    { symbols } = this
+    name = path.node.name
+
+    if symbols[name]:
+      parentScope = path~getScopeParent()
+      if parentScope?.scope and (not parentScope.scope.hasBinding(name)):
+        this.addDefaultImport(name, symbols[name])
+
+  addDefaultImport(name, importPath) ->
+    this.defaultImports[name] = importPath
+
+  runtime(name) ->
+    uname = '_' + name
+    if not this.defaultImports[uname]:
+      this.defaultImports[uname] = `@lightscript/runtime/${name}`
+    t.identifier(uname)
+
+  insertImports(programPath) ->
+    stmts = [...for key name, val importPath in this.defaultImports:
+      if this.useRequire:
+        [buildRequireStatement(name, importPath)]
       else:
-        // import [name] from "[path]"
-        [t.importDeclaration(
-          [t.importDefaultSpecifier(t.identifier(name))]
-          t.stringLiteral(importPath)
-        )~allAtLoc(loc)]
-  ]
+        [buildImportStatement(name, importPath)]
+    ]
 
-  if stmts.length > 0: path.unshiftContainer("body", stmts)
+    if stmts.length > 0: programPath.unshiftContainer("body", stmts)
+
+
+
+
+
+
+
+
+
+export const everyLodashMethod = [
+  "add",
+  "after",
+  "ary",
+  "assign",
+  "assignIn",
+  "assignInWith",
+  "assignWith",
+  "at",
+  "attempt",
+  "before",
+  "bind",
+  "bindAll",
+  "bindKey",
+  "camelCase",
+  "capitalize",
+  "castArray",
+  "ceil",
+  "chain",
+  "chunk",
+  "clamp",
+  "clone",
+  "cloneDeep",
+  "cloneDeepWith",
+  "cloneWith",
+  "compact",
+  "concat",
+  "cond",
+  "conforms",
+  "conformsTo",
+  "constant",
+  "countBy",
+  "create",
+  "curry",
+  "curryRight",
+  "debounce",
+  "deburr",
+  "defaultTo",
+  "defaults",
+  "defaultsDeep",
+  "defer",
+  "delay",
+  "difference",
+  "differenceBy",
+  "differenceWith",
+  "divide",
+  "drop",
+  "dropRight",
+  "dropRightWhile",
+  "dropWhile",
+  "each",
+  "eachRight",
+  "endsWith",
+  "entries",
+  "entriesIn",
+  "eq",
+  "escape",
+  "escapeRegExp",
+  "every",
+  "extend",
+  "extendWith",
+  "fill",
+  "filter",
+  "find",
+  "findIndex",
+  "findKey",
+  "findLast",
+  "findLastIndex",
+  "findLastKey",
+  "first",
+  "flatMap",
+  "flatMapDeep",
+  "flatMapDepth",
+  "flatten",
+  "flattenDeep",
+  "flattenDepth",
+  "flip",
+  "floor",
+  "flow",
+  "flowRight",
+  "forEach",
+  "forEachRight",
+  "forIn",
+  "forInRight",
+  "forOwn",
+  "forOwnRight",
+  "fromPairs",
+  "functions",
+  "functionsIn",
+  "get",
+  "groupBy",
+  "gt",
+  "gte",
+  "has",
+  "hasIn",
+  "head",
+  "identity",
+  "inRange",
+  "includes",
+  "indexOf",
+  "initial",
+  "intersection",
+  "intersectionBy",
+  "intersectionWith",
+  "invert",
+  "invertBy",
+  "invoke",
+  "invokeMap",
+  "isArguments",
+  "isArray",
+  "isArrayBuffer",
+  "isArrayLike",
+  "isArrayLikeObject",
+  "isBoolean",
+  "isBuffer",
+  "isDate",
+  "isElement",
+  "isEmpty",
+  "isEqual",
+  "isEqualWith",
+  "isError",
+  "isFinite",
+  "isFunction",
+  "isInteger",
+  "isLength",
+  "isMap",
+  "isMatch",
+  "isMatchWith",
+  "isNaN",
+  "isNative",
+  "isNil",
+  "isNull",
+  "isNumber",
+  "isObject",
+  "isObjectLike",
+  "isPlainObject",
+  "isRegExp",
+  "isSafeInteger",
+  "isSet",
+  "isString",
+  "isSymbol",
+  "isTypedArray",
+  "isUndefined",
+  "isWeakMap",
+  "isWeakSet",
+  "iteratee",
+  "join",
+  "kebabCase",
+  "keyBy",
+  "keys",
+  "keysIn",
+  "last",
+  "lastIndexOf",
+  "lowerCase",
+  "lowerFirst",
+  "lt",
+  "lte",
+  "map",
+  "mapKeys",
+  "mapValues",
+  "matches",
+  "matchesProperty",
+  "max",
+  "maxBy",
+  "mean",
+  "meanBy",
+  "memoize",
+  "merge",
+  "mergeWith",
+  "method",
+  "methodOf",
+  "min",
+  "minBy",
+  "mixin",
+  "multiply",
+  "negate",
+  "noConflict",
+  "noop",
+  "now",
+  "nth",
+  "nthArg",
+  "omit",
+  "omitBy",
+  "once",
+  "orderBy",
+  "over",
+  "overArgs",
+  "overEvery",
+  "overSome",
+  "pad",
+  "padEnd",
+  "padStart",
+  "parseInt",
+  "partial",
+  "partialRight",
+  "partition",
+  "pick",
+  "pickBy",
+  "property",
+  "propertyOf",
+  "pull",
+  "pullAll",
+  "pullAllBy",
+  "pullAllWith",
+  "pullAt",
+  "random",
+  "range",
+  "rangeRight",
+  "rearg",
+  "reduce",
+  "reduceRight",
+  "reject",
+  "remove",
+  "repeat",
+  "replace",
+  "rest",
+  "result",
+  "reverse",
+  "round",
+  "runInContext",
+  "sample",
+  "sampleSize",
+  "set",
+  "setWith",
+  "shuffle",
+  "size",
+  "slice",
+  "snakeCase",
+  "some",
+  "sortBy",
+  "sortedIndex",
+  "sortedIndexBy",
+  "sortedIndexOf",
+  "sortedLastIndex",
+  "sortedLastIndexBy",
+  "sortedLastIndexOf",
+  "sortedUniq",
+  "sortedUniqBy",
+  "split",
+  "spread",
+  "startCase",
+  "startsWith",
+  "stubArray",
+  "stubFalse",
+  "stubObject",
+  "stubString",
+  "stubTrue",
+  "subtract",
+  "sum",
+  "sumBy",
+  "tail",
+  "take",
+  "takeRight",
+  "takeRightWhile",
+  "takeWhile",
+  "tap",
+  "template",
+  "templateSettings",
+  "throttle",
+  "thru",
+  "times",
+  "toArray",
+  "toFinite",
+  "toInteger",
+  "toLength",
+  "toLower",
+  "toNumber",
+  "toPairs",
+  "toPairsIn",
+  "toPath",
+  "toPlainObject",
+  "toSafeInteger",
+  "toString",
+  "toUpper",
+  "transform",
+  "trim",
+  "trimEnd",
+  "trimStart",
+  "truncate",
+  "unary",
+  "unescape",
+  "union",
+  "unionBy",
+  "unionWith",
+  "uniq",
+  "uniqBy",
+  "uniqWith",
+  "uniqueId",
+  "unset",
+  "unzip",
+  "unzipWith",
+  "update",
+  "updateWith",
+  "upperCase",
+  "upperFirst",
+  "values",
+  "valuesIn",
+  "without",
+  "words",
+  "wrap",
+  "xor",
+  "xorBy",
+  "xorWith",
+  "zip",
+  "zipObject",
+  "zipObjectDeep",
+  "zipWith",
+];
+
+export const lodashImports = everyLodashMethod.reduce((obj, methodName) => {
+  obj[methodName] = "lodash";
+  return obj;
+}, {});
+
+export const defaultImports = Object.assign({},
+  lodashImports,
+);

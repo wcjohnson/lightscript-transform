@@ -10,6 +10,7 @@ import { transformIfExpression } from "../transforms/if"
 import { enterFunction, exitFunction } from "../transforms/functions"
 import { transformAssignmentExpression } from "../transforms/assignments"
 import { transformAwaitExpression } from "../transforms/await"
+import { transformMatchExpression, transformMatchStatement } from "../transforms/match"
 
 export default mainPass(state, path): void ->
   path.traverse({
@@ -81,4 +82,13 @@ export default mainPass(state, path): void ->
 
     VariableDeclaration(path): void ->
       checkImplicitConstShadowing(path)
+
+    ReferencedIdentifier(path): void ->
+      state.imports.maybeProcessStdlibIdentifier(path)
+
+    LscMatchExpression(path): void ->
+      transformMatchExpression(path, state)
+
+    LscMatchStatement(path): void ->
+      transformMatchStatement(path, state)
   })

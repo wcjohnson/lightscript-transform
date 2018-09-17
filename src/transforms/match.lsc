@@ -3,7 +3,6 @@ import { toBlockStatement } from '../helpers/blocks'
 import { undeclaredRef, checkFalsePositiveReference } from '../helpers/variables'
 import { matchesDestructuringPattern, accessors, isNonEmptyPattern } from '../helpers/destructure'
 import { createAndExpression as And, createOrExpression as Or } from '../helpers/logical'
-import { runtime } from '../state/runtime'
 
 import {
   getLoc, placeAtLoc as atLoc, placeAtNode as atNode,
@@ -57,7 +56,7 @@ isPredicate(node) ->
   node~isa("CallExpression")
 
 transformAtom(mtch, path) ->
-  { discriminantRef } = mtch
+  { discriminantRef, compilerState } = mtch
   { node } = path
 
   match node:
@@ -74,7 +73,7 @@ transformAtom(mtch, path) ->
       mtch~transformPredicate(path)
     | else:
       t.callExpression(
-        runtime('isMatch')~t.clone()~atNode(node)
+        compilerState.imports.runtime('isMatch')~atNode(node)
         [ node, discriminantRef ]
       )~atNode(node)
 
@@ -86,20 +85,20 @@ transformMatchTest(mtch, casePath) ->
   { discriminantRef } = mtch
 
   And([
-    ...if outerGuard: outerGuard
+    ...if outerGuard: [outerGuard]
     ...if atoms and atoms.length > 0:
-      mtch~transformAtoms(casePath.get("atoms"))
+      [mtch~transformAtoms(casePath.get("atoms"))]
     ...if binding and assertive:
-      discriminantRef~matchesDestructuringPattern(binding)
+      [discriminantRef~matchesDestructuringPattern(binding)]
     ...if innerGuard:
       if binding:
         // Transform referenced identifiers in the inner guard into accessors
         // into the matched pattern.
         const bindingAccessors = {}
         binding~accessors(discriminantRef, bindingAccessors)
-        mtch~transformInnerGuard(casePath.get("innerGuard"), bindingAccessors)
+        [mtch~transformInnerGuard(casePath.get("innerGuard"), bindingAccessors)]
       else:
-        innerGuard
+        [innerGuard]
   ])
 
 transformBoundConsequent({discriminantRef}, binding, consequent) ->
@@ -139,19 +138,19 @@ export transformMatchCases(mtch, [casePath, ...rest]) ->
     consequent
 
 // Computed values needed in recursive descent.
-export getMatchInfo(path, discriminantRef) ->
+export getMatchInfo(path, discriminantRef, compilerState) ->
   { node } = path
   {
-    path, node, discriminantRef
+    path, node, discriminantRef, compilerState
     // Track last case for source map positioning
     lastCase: node.cases[node.cases.length - 1]
   }
 
-export transformMatchExpression(path) ->
+export transformMatchExpression(path, compilerState) ->
   { node } = path
 
   argRef = path.scope.generateUidIdentifier("it")~atLoc(getLoc(node)~span(1))
-  matchBody = getMatchInfo(path, argRef)~transformMatchCases(path.get("cases"))
+  matchBody = getMatchInfo(path, argRef, compilerState)~transformMatchCases(path.get("cases"))
 
   iife = t.callExpression(
     t.arrowFunctionExpression(
@@ -162,7 +161,7 @@ export transformMatchExpression(path) ->
 
   path.replaceWith(iife)
 
-export transformMatchStatement(path) ->
+export transformMatchStatement(path, compilerState) ->
   { discriminant } = path.node;
 
   { ref, declarator, isComplex } = undeclaredRef(path, discriminant, "it")
@@ -172,5 +171,5 @@ export transformMatchStatement(path) ->
     )
 
   path.replaceWith(
-    getMatchInfo(path, ref)~transformMatchCases(path.get("cases"))
+    getMatchInfo(path, ref, compilerState)~transformMatchCases(path.get("cases"))
   )

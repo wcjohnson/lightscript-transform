@@ -37,3 +37,5 @@ class A extends B:
 {...for elem e in arr: {[e]: "hi"}}
 
 [...if flag: val]
+
+x~map(y)
