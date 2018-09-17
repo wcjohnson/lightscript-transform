@@ -101,7 +101,13 @@ let CompilerTestable = class CompilerTestable extends _TestRunner.Testable {
   }runTest() {
     let code, map;
     try {
-      ({ code, map } = (0, _core.transformSync)(this.actual, this.options));
+      let realOpts;
+      if (this.options.throws) {
+        realOpts = Object.assign({}, this.options);
+        delete realOpts.throws;
+      } else {
+        realOpts = this.options;
+      }({ code, map } = (0, _core.transformSync)(this.actual, realOpts));
     } catch (err) {
       if (this.options.throws) {
         if (err.message === this.options.throws) {

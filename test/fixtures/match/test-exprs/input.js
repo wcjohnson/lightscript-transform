@@ -1,0 +1,13 @@
+match x:
+  | if a: "a is truthy"
+  | if x == a: "x equals a"
+  | if f(): "f() is truthy"
+  | if x == f(): "x equals f()"
+  | if not f(): "f() is falsy"
+  | if not (x == f()): "x isnt f()"
+  | 1 or 2: "smaller than 3"
+  | 1 or not 2: "anything but 2"
+  | "nothing" or null if (x > -1 and not (x >= 1)): "something like zero"
+  | not undefined: "something"
+  | not null: "maybe something"
+  | if not (x >= 1): "small"

@@ -1,0 +1,3 @@
+obj.method?()
+
+this.method?()

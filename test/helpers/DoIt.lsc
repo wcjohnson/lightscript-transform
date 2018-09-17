@@ -77,7 +77,14 @@ class CompilerTestable extends Testable:
   runTest(): void ->
     let code, map
     try {
-      now {code, map} = transformSync(this.actual, this.options)
+      let realOpts
+      if this.options.throws:
+        now realOpts = Object.assign({}, this.options)
+        delete realOpts.throws
+      else:
+        now realOpts = this.options
+
+      now {code, map} = transformSync(this.actual, realOpts)
     } catch(err) {
       if this.options.throws:
         if err.message == this.options.throws:

@@ -1,0 +1,1 @@
+typeof b !== "function" ? void 0 : b(a, c);
