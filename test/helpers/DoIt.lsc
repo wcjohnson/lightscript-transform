@@ -82,6 +82,9 @@ class CompilerTestable extends Testable:
         it(this.title, => this.runTest())
       else:
         console.log("Ran test:", this.title)
+    elif this.exec:
+      if typeof(it) != 'undefined':
+        it(this.title, => this.runExecTest())
     else:
       // console.log("skipping (no input)", this.title)
       return
