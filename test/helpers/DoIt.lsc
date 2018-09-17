@@ -1,10 +1,26 @@
+import path from 'path'
+import vm from 'vm'
+import assert from 'assert'
+
 import { TestRun, Testable, TestOptions } from './TestRunner'
 import { allTests, TestFilter } from './TestFilter'
-import path from 'path'
-import fs from 'fs'
 import { transformSync } from '@babel/core'
 import thisPlugin from '../../lib'
 import diff from 'jest-diff'
+
+testContext = vm.createContext({
+  assert
+})
+testContext.global = testContext
+
+runExecCode(code) ->
+  filename="exec.js"
+  dirname="."
+  mod = { id: filename, exports: {} }
+  req = -> return
+
+  src = `(function(exports, require, module, __filename, __dirname, opts) {${code}\n});`
+  vm.runInContext(src, testContext)(mod.exports, req, mod, filename, dirname, {})
 
 fixPlugins(opts) ->
   if opts.plugins:
@@ -48,6 +64,7 @@ class CompilerTestable extends Testable:
 
     this.actual = this.readLocalArtifact("input", ['.js', '.lsc'])
     this.expected = this.readLocalArtifact("output", ['.override.js', '.js'])
+    this.exec = this.readLocalArtifact("exec", ['.js', '.lsc'])
 
     // Use parent input if no child input.
     if (not this.actual) and (this.parent) and (this.parent.actual):
@@ -74,10 +91,19 @@ class CompilerTestable extends Testable:
     // err.message = this.title + ": " + err.message
     throw err
 
+  runExecTest(): void ->
+    if this.exec:
+      let execCode
+      try:
+        now { code: execCode } = transformSync(this.exec, this.options)
+        runExecCode(execCode)
+      catch (err):
+        this.throwAnnotatedError(new Error(`Exec '${execCode}' failed: ${err}`))
+
   runTest(): void ->
-    let code, map
+    this.runExecTest()
+    let code, map, realOpts
     try {
-      let realOpts
       if this.options.throws:
         now realOpts = Object.assign({}, this.options)
         delete realOpts.throws

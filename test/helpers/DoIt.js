@@ -1,16 +1,20 @@
 'use strict';
 
-var _TestRunner = require('./TestRunner');
-
-var _TestFilter = require('./TestFilter');
-
 var _path = require('path');
 
 var _path2 = _interopRequireDefault(_path);
 
-var _fs = require('fs');
+var _vm = require('vm');
 
-var _fs2 = _interopRequireDefault(_fs);
+var _vm2 = _interopRequireDefault(_vm);
+
+var _assert = require('assert');
+
+var _assert2 = _interopRequireDefault(_assert);
+
+var _TestRunner = require('./TestRunner');
+
+var _TestFilter = require('./TestFilter');
 
 var _core = require('@babel/core');
 
@@ -24,7 +28,20 @@ var _jestDiff2 = _interopRequireDefault(_jestDiff);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function fixPlugins(opts) {
+const testContext = _vm2.default.createContext({
+  assert: _assert2.default
+});
+testContext.global = testContext;
+
+function runExecCode(code) {
+  const filename = "exec.js";
+  const dirname = ".";
+  const mod = { id: filename, exports: {} };
+  const req = function () {
+    return;
+  };const src = `(function(exports, require, module, __filename, __dirname, opts) {${code}\n});`;
+  return _vm2.default.runInContext(src, testContext)(mod.exports, req, mod, filename, dirname, {});
+}function fixPlugins(opts) {
   if (opts.plugins) {
     for (let _arr = opts.plugins, i = 0, _len = _arr.length; i < _len; i++) {
       const e = _arr[i];
@@ -71,6 +88,7 @@ let CompilerTestable = class CompilerTestable extends _TestRunner.Testable {
 
     this.actual = this.readLocalArtifact("input", ['.js', '.lsc']);
     this.expected = this.readLocalArtifact("output", ['.override.js', '.js']);
+    this.exec = this.readLocalArtifact("exec", ['.js', '.lsc']);
 
     // Use parent input if no child input.
     if (!this.actual && this.parent && this.parent.actual) {
@@ -98,10 +116,20 @@ let CompilerTestable = class CompilerTestable extends _TestRunner.Testable {
     // Unnecessary because jest is good
     // err.message = this.title + ": " + err.message
     throw err;
+  }runExecTest() {
+    if (this.exec) {
+      let execCode;
+      try {
+        ({ code: execCode } = (0, _core.transformSync)(this.exec, this.options));
+        runExecCode(execCode);
+      } catch (err) {
+        this.throwAnnotatedError(new Error(`Exec '${execCode}' failed: ${err}`));
+      }
+    }
   }runTest() {
-    let code, map;
+    this.runExecTest();
+    let code, map, realOpts;
     try {
-      let realOpts;
       if (this.options.throws) {
         realOpts = Object.assign({}, this.options);
         delete realOpts.throws;
