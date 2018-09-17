@@ -63,12 +63,14 @@ export class Options:
   setOptions(babelOpts, parserOpts, lscOpts): void ->
     this.babelOpts = babelOpts
     this.parserOpts = parserOpts
-    this.lscOpts = lscOpts or {}
+    this.lscOpts = Object.assign({}, lscOpts or {})
 
     this.fileTypeInfo = getFileTypeInfo(babelOpts.filename)
 
     // Attempt to determine if the input is LightScript
     if this.fileTypeInfo.isLightScript and (lscOpts.isLightScript == undefined):
+      this.isLightScript = true
+    elif lscOpts.isLightScript:
       this.isLightScript = true
     else:
       this.isLightScript = false
@@ -79,7 +81,7 @@ export class Options:
     // Merge config directives into lsc options
     this.configurationDirectives = configurationDirectives
     if configurationDirectives.isLightScript: this.isLightScript = true
-    Object.assign(this.lscOpts, this.configurationDirectives)
+    this.lscOpts = Object.assign(this.lscOpts, this.configurationDirectives)
 
   getParserOptions() ->
     pluginOpts = this.lscOpts or {}
