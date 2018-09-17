@@ -4,7 +4,7 @@ import { transformTildeCall, transformOptionalTildeCall } from '../transforms/ti
 import { maybeReplaceWithInlinedOperator } from '../transforms/inlinedOperators'
 import { transformTryExpression, transformTryStatement } from "../transforms/try"
 import { transformNamedArrowFunction, transformNamedArrowMemberExpression, transformArrowFunctionExpression } from "../transforms/arrows"
-import { transformClassBody } from "../transforms/classes"
+import { transformClassBody, transformObjectMethod } from "../transforms/classes"
 import { maybeTransformArrayWithSpreadLoops, maybeTransformObjectWithSpreadLoops, maybeTransformJSXExpressionWithSpreadLoop, transformSpreadElement } from "../transforms/spreadLoops"
 import { transformIfExpression } from "../transforms/if"
 import { enterFunction, exitFunction } from "../transforms/functions"
@@ -52,6 +52,9 @@ export default mainPass(state, path): void ->
 
     ClassBody(path): void ->
       transformClassBody(path)
+
+    ObjectMethod(path): void ->
+      transformObjectMethod(path)
 
     LscForInArrayStatement(path): void ->
       transformForInArrayStatement(path)

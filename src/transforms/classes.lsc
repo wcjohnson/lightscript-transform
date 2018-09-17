@@ -192,3 +192,20 @@ export transformClassBody(path): void ->
   if (fatStaticArrows.length) {
     bindMethods(path.parentPath, fatStaticArrows);
   }
+
+export transformObjectMethod(path): void ->
+  { node } = path
+
+  // Transform methods with fat arrows
+  if (node.kind != "method") or (node.skinny != false): return
+
+  // Fat arrows should get lexical `this`
+  // Transform to an objectProperty with an ArrowFunctionExpression body
+  func = t.arrowFunctionExpression(node.params, node.body, node.async)
+  func.generator = node.generator
+  func.returnType = node.returnType
+  func.typeParameters = node.typeParameters
+
+  prop = t.objectProperty(node.key, func, node.computed, false, node.decorators)
+
+  path.replaceWith(prop)

@@ -1,6 +1,6 @@
 let o;
 o = {
-  f() {
+  f: () => {
     return this;
-  } };
-o.f = o.f.bind(o);
+  }
+};

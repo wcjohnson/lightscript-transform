@@ -3,4 +3,5 @@ const o = {
     1;
     return 2;
   }
+
 };

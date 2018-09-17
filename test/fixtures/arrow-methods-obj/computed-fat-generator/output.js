@@ -1,6 +1,6 @@
 const o = {
-  *["f"]() {
+  ["f"]: function* () {
     1;
     return 2;
-  } };
-o["f"] = o["f"].bind(o);
+  }.bind(this)
+};
