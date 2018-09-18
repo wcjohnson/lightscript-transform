@@ -1,6 +1,8 @@
 import path from 'path'
 import vm from 'vm'
 import assert from 'assert'
+import resolve from 'resolve'
+import fs from 'fs'
 
 import { TestRun, Testable, TestOptions } from './TestRunner'
 import { allTests, TestFilter } from './TestFilter'
@@ -10,14 +12,45 @@ import diff from 'jest-diff'
 
 testContext = vm.createContext({
   assert
+  console
 })
 testContext.global = testContext
+moduleCache = {}
+
+function runModuleInTestContext(id: string, relativeFilename: string) {
+  const filename = resolve.sync(id, {
+    basedir: path.dirname(relativeFilename),
+  });
+
+  // Expose Node-internal modules if the tests want them. Note, this will not execute inside
+  // the context's global scope.
+  if (filename === id) return require(id);
+
+  if (moduleCache[filename]) return moduleCache[filename].exports;
+
+  const module = (moduleCache[filename] = {
+    id: filename,
+    exports: {},
+  });
+  const dirname = path.dirname(filename);
+  const req = id => runModuleInTestContext(id, filename);
+
+  const src = fs.readFileSync(filename, "utf8");
+  const code = `(function (exports, require, module, __filename, __dirname) {${src}\n});`;
+
+  vm.runInContext(code, testContext, {
+    filename,
+    displayErrors: true,
+  }).call(module.exports, module.exports, req, module, filename, dirname);
+
+  return module.exports;
+}
 
 runExecCode(code) ->
   filename="exec.js"
   dirname="."
   mod = { id: filename, exports: {} }
-  req = (x) -> require(x)
+  req = (x) -> runModuleInTestContext(x, filename)
 
   src = `(function(exports, require, module, __filename, __dirname, opts) {${code}\n});`
   vm.runInContext(src, testContext)(mod.exports, req, mod, filename, dirname, {})

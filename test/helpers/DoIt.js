@@ -12,6 +12,14 @@ var _assert = require('assert');
 
 var _assert2 = _interopRequireDefault(_assert);
 
+var _resolve = require('resolve');
+
+var _resolve2 = _interopRequireDefault(_resolve);
+
+var _fs = require('fs');
+
+var _fs2 = _interopRequireDefault(_fs);
+
 var _TestRunner = require('./TestRunner');
 
 var _TestFilter = require('./TestFilter');
@@ -29,16 +37,47 @@ var _jestDiff2 = _interopRequireDefault(_jestDiff);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const testContext = _vm2.default.createContext({
-  assert: _assert2.default
+  assert: _assert2.default,
+  console
 });
 testContext.global = testContext;
+const moduleCache = {};
+
+function runModuleInTestContext(id, relativeFilename) {
+  const filename = _resolve2.default.sync(id, {
+    basedir: _path2.default.dirname(relativeFilename)
+  });
+
+  // Expose Node-internal modules if the tests want them. Note, this will not execute inside
+  // the context's global scope.
+  if (filename === id) return require(id);
+
+  if (moduleCache[filename]) return moduleCache[filename].exports;
+
+  const module = moduleCache[filename] = {
+    id: filename,
+    exports: {}
+  };
+  const dirname = _path2.default.dirname(filename);
+  const req = id => runModuleInTestContext(id, filename);
+
+  const src = _fs2.default.readFileSync(filename, "utf8");
+  const code = `(function (exports, require, module, __filename, __dirname) {${src}\n});`;
+
+  _vm2.default.runInContext(code, testContext, {
+    filename,
+    displayErrors: true
+  }).call(module.exports, module.exports, req, module, filename, dirname);
+
+  return module.exports;
+}
 
 function runExecCode(code) {
   const filename = "exec.js";
   const dirname = ".";
   const mod = { id: filename, exports: {} };
   const req = function (x) {
-    return require(x);
+    return runModuleInTestContext(x, filename);
   };const src = `(function(exports, require, module, __filename, __dirname, opts) {${code}\n});`;
   return _vm2.default.runInContext(src, testContext)(mod.exports, req, mod, filename, dirname, {});
 }function fixPlugins(opts) {
