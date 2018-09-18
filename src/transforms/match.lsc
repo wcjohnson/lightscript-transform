@@ -43,7 +43,8 @@ transformInnerGuard(mtch, path, bindingAccessors) ->
 transformPredicate(mtch, path) ->
   { discriminantRef } = mtch
   path.traverse({
-    MatchPlaceholderExpression(phPath) -> phPath.replaceWith(discriminantRef)
+    LscMatchPlaceholderExpression(phPath): void ->
+      phPath.replaceWith(discriminantRef)
   })
   path.node
 
@@ -53,7 +54,7 @@ isStrictEqualityLiteral(node) ->
   (node~isa("Literal") and (not node~isa("RegExpLiteral")))
 
 isPredicate(node) ->
-  node~isa("CallExpression")
+  node~isa("LscTildeCallExpression")
 
 transformAtom(mtch, path) ->
   { discriminantRef, compilerState } = mtch
