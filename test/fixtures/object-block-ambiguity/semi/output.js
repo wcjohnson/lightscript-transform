@@ -1,1 +1,4 @@
-a;const { b } = c;
+a;
+const {
+  b
+} = c;
