@@ -1,6 +1,7 @@
-const _isMatch = require("@oigroup/lightscript-runtime/isMatch");
+const _isMatch = require("@lightscript/runtime/isMatch");
+
 if (!(x === 1) || !_isMatch(Number, x) || !(x === "hi")) {
   it;
-} else if (!_isMatch(it, x) || !Predicate(x) || !foo(bar)) {
+} else if (!_isMatch(it, x) || !Predicate(x)) {
   it;
 }
