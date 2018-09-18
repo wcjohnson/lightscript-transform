@@ -1,1 +1,4 @@
-for (const { k, v } of generator) k;
+for (const {
+  k,
+  v
+} of generator) k;
