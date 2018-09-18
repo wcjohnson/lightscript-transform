@@ -270,5 +270,6 @@ export transformSafeSpreadElement(path) ->
   path.replaceWith! nextNode
 
 export transformSpreadElement(path) ->
-  // TODO: Verify that this is a SpreadElement in an Array or CallExpr
-  transformSafeSpreadElement(path)
+  parent = path.parent
+  if parent~isa('ArrayExpression') or parent~isa('CallExpression'):
+    transformSafeSpreadElement(path)
