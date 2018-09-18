@@ -17,7 +17,7 @@ runExecCode(code) ->
   filename="exec.js"
   dirname="."
   mod = { id: filename, exports: {} }
-  req = -> return
+  req = (x) -> require(x)
 
   src = `(function(exports, require, module, __filename, __dirname, opts) {${code}\n});`
   vm.runInContext(src, testContext)(mod.exports, req, mod, filename, dirname, {})

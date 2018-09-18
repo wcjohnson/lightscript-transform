@@ -37,8 +37,8 @@ function runExecCode(code) {
   const filename = "exec.js";
   const dirname = ".";
   const mod = { id: filename, exports: {} };
-  const req = function () {
-    return;
+  const req = function (x) {
+    return require(x);
   };const src = `(function(exports, require, module, __filename, __dirname, opts) {${code}\n});`;
   return _vm2.default.runInContext(src, testContext)(mod.exports, req, mod, filename, dirname, {});
 }function fixPlugins(opts) {
