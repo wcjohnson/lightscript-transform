@@ -122,7 +122,7 @@ let CompilerTestable = class CompilerTestable extends _TestRunner.Testable {
     throw err;
   }runExecTest() {
     if (this.exec) {
-      let execCode;
+      let execCode = this.exec;
       try {
         ({ code: execCode } = (0, _core.transformSync)(this.exec, this.options));
         runExecCode(execCode);

@@ -96,7 +96,7 @@ class CompilerTestable extends Testable:
 
   runExecTest(): void ->
     if this.exec:
-      let execCode
+      let execCode = this.exec
       try:
         now { code: execCode } = transformSync(this.exec, this.options)
         runExecCode(execCode)
