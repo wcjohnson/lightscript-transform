@@ -4,5 +4,6 @@ function fn() {
   function inner() {
     return value;
   }
+
   return inner;
 }
