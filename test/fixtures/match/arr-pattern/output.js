@@ -1,4 +1,5 @@
-const _hasLength = require('@oigroup/lightscript-runtime/hasLength');
+const _hasLength = require("@lightscript/runtime/hasLength");
+
 if (_hasLength(x, 0, 0)) {
   "empty";
 } else if (_hasLength(x, 2, 2)) {

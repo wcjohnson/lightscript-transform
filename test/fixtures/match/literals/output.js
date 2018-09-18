@@ -1,4 +1,5 @@
-const _isMatch = require("@oigroup/lightscript-runtime/isMatch");
+const _isMatch = require("@lightscript/runtime/isMatch");
+
 if (x === 2) {
   "two";
 } else if (x === "hello") {

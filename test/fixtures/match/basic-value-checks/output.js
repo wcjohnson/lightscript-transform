@@ -1,4 +1,5 @@
-const _isMatch = require("@oigroup/lightscript-runtime/isMatch");
+const _isMatch = require("@lightscript/runtime/isMatch");
+
 if (x === 1 || x === 0.1 || x === 0x11 || x === +1 || x === -1) {
   it;
 } else if (x === "hi") {

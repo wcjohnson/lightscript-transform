@@ -1,6 +1,10 @@
-const _hasProps = require("@oigroup/lightscript-runtime/hasProps");
+const _hasProps = require("@lightscript/runtime/hasProps");
+
 if (x > 2 && _hasProps(x, "y")) {
-  const { y } = x;
+  const {
+    y
+  } = x;
+
   if (x > 10) {
     "soo big";
   } else if (x > 5) {

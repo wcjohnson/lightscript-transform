@@ -1,9 +1,6 @@
 class Parent {}
 class Child extends Parent {}
 
-trueFlag = true
-falseFlag = false
-
 assert.equal(3, match [1, 2]:
   | with [a, b]: a + b
 )

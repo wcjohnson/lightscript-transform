@@ -1,6 +1,11 @@
 if (true) {
-  const y = x;y;
+  const y = x;
+  y;
 }
+
 if (true) {
-  const [a, { b: c }] = x;c;
+  const [a, {
+    b: c
+  }] = x;
+  c;
 }
