@@ -384,12 +384,3 @@ export const everyLodashMethod = [
   "zipObjectDeep",
   "zipWith",
 ];
-
-export const lodashImports = everyLodashMethod.reduce((obj, methodName) => {
-  obj[methodName] = "lodash";
-  return obj;
-}, {});
-
-export const defaultImports = Object.assign({},
-  lodashImports,
-);

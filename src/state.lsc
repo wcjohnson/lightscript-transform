@@ -63,6 +63,3 @@ export class CompilerState:
 
     // Execute compiler passes
     mainPass(this, path)
-
-    // Add implicit imports
-    this.imports.insertImports(path)

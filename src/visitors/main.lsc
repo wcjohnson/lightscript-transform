@@ -100,3 +100,6 @@ export default main(state, path): void ->
     LscMatchStatement(path): void ->
       transformMatchStatement(path, state)
   })
+
+  // Add implicit imports
+  state.imports.insertImports(path)
