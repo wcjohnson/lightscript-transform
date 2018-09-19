@@ -1,2 +1,2 @@
-'use @oigroup/lightscript with safeCall: false'
-a?()
+'use @oigroup/lightscript with stdlib: false'
+map()

@@ -3,13 +3,14 @@
 /*
 * comment 2
 */
-"use @oigroup/lightscript with noEnforcedSubscriptIndentation";
+"use @oigroup/lightscript with flippedImports";
 // comment 3
 'use strict'
 /*
 comment 4
 */
-'use @oigroup/lightscript with safeCall'
+'use @oigroup/lightscript with placeholderArgs'
 
-a?()
-.b
+import "stuff": something
+
+f() -> _

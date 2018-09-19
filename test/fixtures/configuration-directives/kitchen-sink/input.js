@@ -9,12 +9,12 @@
         * butA
         */
           'dream'
-            'use @oigroup/lightscript with bangCall'
+            'use @oigroup/lightscript with placeholderArgs'
             /* and then */
 
 
 
             // we do
-            'use @oigroup/lightscript with safeCall'
+            'use @oigroup/lightscript with placeholder: "P"'
 
-what?!
+f() -> P

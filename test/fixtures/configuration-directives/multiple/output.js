@@ -3,12 +3,18 @@
 /*
 * comment 2
 */
-"use @oigroup/lightscript with noEnforcedSubscriptIndentation";
-// comment 3
+
+"use @oigroup/lightscript with flippedImports"; // comment 3
+
 'use strict';
 /*
 comment 4
 */
-'use @oigroup/lightscript with safeCall';
 
-typeof a !== 'function' ? void 0 : a().b;
+'use @oigroup/lightscript with placeholderArgs';
+
+import something from "stuff";
+
+function f(_arg) {
+  return _arg;
+}
