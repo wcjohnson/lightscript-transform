@@ -30,6 +30,14 @@ export compilerOptions = {
     description: "Specify an identifier to be transformed into PlaceholderExpression."
     valueType: "string"
   }
+  disableJsx: {
+    description: "Don't parse JSX expressions."
+    valueType: "boolean"
+  }
+  disableFlow: {
+    description: "Don't parse Flow type annotations."
+    valueType: "boolean"
+  }
 }
 
 getFileTypeInfo(filename) ->
