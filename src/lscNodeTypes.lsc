@@ -346,3 +346,15 @@ export registerLightscriptNodeTypes(t): void ->
         },
       },
     });
+
+  if not t.hasType("LscSafeAwaitExpression"):
+    definePluginType("LscSafeAwaitExpression", {
+      builder: ["argument"],
+      visitor: ["argument"],
+      aliases: ["AwaitExpression", "Expression", "Terminatorless"],
+      fields: {
+        argument: {
+          validate: assertNodeType("Expression"),
+        }
+      }
+    });

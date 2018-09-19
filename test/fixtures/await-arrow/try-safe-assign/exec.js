@@ -3,7 +3,7 @@ throwInOne() ->
     setTimeout(-> reject(new Error()), 1000)
 
 f() -/>
-  x <!- throwInOne()
+  x = try: <- throwInOne()
   assert(x instanceof Error)
 
 f()

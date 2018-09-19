@@ -7,3 +7,12 @@ export transformAwaitExpression(path): void ->
       [path.node.argument],
     );
     path.get("argument").replaceWith(promiseDotAllCall);
+
+export transformSafeAwaitExpression(path): void ->
+  { node } = path
+  if path.parent~isa("ExpressionStatement"):
+    tryStmt = t.tryStatement(t.blockStatement([t.expressionStatement(t.awaitExpression(node.argument))]))
+    path.parentPath.replaceWith(tryStmt)
+  else:
+    tryExpr = t.LscTryExpression(t.awaitExpression(node.argument))
+    path.replaceWith(tryExpr)

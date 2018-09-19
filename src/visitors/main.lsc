@@ -9,7 +9,7 @@ import { maybeTransformArrayWithSpreadLoops, maybeTransformObjectWithSpreadLoops
 import { transformIfExpression } from "../transforms/if"
 import { enterFunction, exitFunction } from "../transforms/functions"
 import { transformAssignmentExpression } from "../transforms/assignments"
-import { transformAwaitExpression } from "../transforms/await"
+import { transformAwaitExpression, transformSafeAwaitExpression } from "../transforms/await"
 import { transformMatchExpression, transformMatchStatement } from "../transforms/match"
 import { transformAllPlaceholders } from "../transforms/placeholders"
 
@@ -23,6 +23,9 @@ export default main(state, path): void ->
       enter(path): void -> enterFunction(path)
       exit(path): void -> exitFunction(path)
     }
+
+    LscSafeAwaitExpression(path): void ->
+      transformSafeAwaitExpression(path)
 
     AwaitExpression(path): void ->
       transformAwaitExpression(path)
