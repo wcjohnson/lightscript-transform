@@ -11,8 +11,13 @@ import { enterFunction, exitFunction } from "../transforms/functions"
 import { transformAssignmentExpression } from "../transforms/assignments"
 import { transformAwaitExpression } from "../transforms/await"
 import { transformMatchExpression, transformMatchStatement } from "../transforms/match"
+import { transformAllPlaceholders } from "../transforms/placeholders"
 
-export default mainPass(state, path): void ->
+export default main(state, path): void ->
+  // Placeholders must be transformed first
+  if state.options.placeholderArgsEnabled():
+    transformAllPlaceholders(path)
+
   path.traverse({
     Function: {
       enter(path): void -> enterFunction(path)

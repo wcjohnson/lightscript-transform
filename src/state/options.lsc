@@ -113,7 +113,7 @@ export class Options:
     if not pluginOpts.disableFlow: plugins~addParserPlugin("flow")
     if pluginOpts.bangCall != false: plugins.push("bangCall")
     if pluginOpts.flippedImports: plugins.push("flippedImports")
-    if pluginOpts.placeholderArgs: plugins.push("syntacticPlaceholder")
+    if pluginOpts.placeholderArgs: plugins.push("syntacticPlaceholders")
     if pluginOpts.placeholder:
       opts.placeholder = pluginOpts.placeholder
 
@@ -122,3 +122,7 @@ export class Options:
   inlinedOperatorsEnabled() ->
     opts = this.lscOpts
     not ((opts.stdlib === false) or (typeof opts.stdlib === "object" && opts.stdlib.lightscript === false))
+
+  placeholderArgsEnabled(): boolean ->
+    opts = this.lscOpts
+    opts.placeholderArgs

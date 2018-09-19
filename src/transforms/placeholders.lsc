@@ -1,12 +1,13 @@
 import t from '../types'
+import { getFunctionParent } from '../helpers/blocks'
 
-isIndexedPlaceholderPath(phPath) -> !!phPath.node.index
+isIndexedPlaceholderPath(phPath) -> (phPath.node.index)~looseNotEq(null)
 isSpreadPlaceholderPath(phPath) -> phPath.parentPath?.node.type == "SpreadElement"
-isNonIndexedPlaceholderPath(phPath) -> (not phPath.node.index) and (not phPath~isSpreadPlaceholderPath())
+isNonIndexedPlaceholderPath(phPath) -> (phPath.node.index)~looseEq(null) and (not phPath~isSpreadPlaceholderPath())
 
 registerPlaceholder(functions, path, programPath) ->
-  fnPath = path.getFunctionParent()
-  if fnPath == programPath || !fnPath.node || !fnPath.node.params:
+  fnPath = path~getFunctionParent()
+  if !fnPath || !fnPath.node || !fnPath.node.params:
     throw path.buildCodeFrameError("Placeholders cannot be used outside functions.")
 
   if fnPath.node.params.length:
