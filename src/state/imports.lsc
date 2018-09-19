@@ -1,5 +1,4 @@
 import t from '../types'
-import { placeTreeAtLocWhenUnplaced as allAtLoc } from 'ast-loc-utils'
 import { getScopeParent } from "../helpers/blocks"
 import { checkFalsePositiveReference } from "../helpers/variables"
 

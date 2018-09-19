@@ -47,7 +47,7 @@ export class CompilerState:
     this.options.isLightScript
 
   // Main program visitor
-  visitProgram(path, state): void ->
+  visitProgram(path): void ->
     // Only transform LightScript files.
     if not this.isLightScript(): return
 

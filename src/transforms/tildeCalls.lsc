@@ -1,4 +1,4 @@
-import t, { is, isa } from '../types'
+import t from '../types'
 import { hoistRef } from '../helpers/variables'
 
 isOptionalNode(node) ->

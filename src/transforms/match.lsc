@@ -6,8 +6,7 @@ import { createAndExpression as And, createOrExpression as Or } from '../helpers
 
 import {
   getLoc, placeAtLoc as atLoc, placeAtNode as atNode,
-  getSurroundingLoc, span, traverse,
-  placeTreeAtLocWhenUnplaced as allAtLoc
+  getSurroundingLoc, span, traverse
 } from 'ast-loc-utils'
 
 isUndefined(node) ->

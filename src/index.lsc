@@ -6,7 +6,7 @@ export default LightScript(babel) ->
       state = new CompilerState(babel)
       state.manipulateOptions(opts, parserOpts, plugin)
 
-    parserOverride(code, parserOpts, babylon7) ->
+    parserOverride(code, parserOpts) ->
       // Retrieve compiler state created by manipulateOptions
       state = parserOpts.lscCompiler
       state.parserOverride(code, parserOpts)

@@ -1,4 +1,4 @@
-import t, { isa } from '../types'
+import { isa } from '../types'
 import { toStatement } from './blocks'
 import { isDestructuringPattern, toRestructureExpression } from './restructure'
 

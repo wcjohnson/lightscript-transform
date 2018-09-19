@@ -3,9 +3,7 @@ import { transformTails } from '../helpers/tails'
 import { toBlockStatement } from '../helpers/blocks'
 
 import {
-  getLoc, placeAtLoc as atLoc, placeAtNode as atNode,
-  getSurroundingLoc, span, traverse,
-  placeTreeAtLocWhenUnplaced as allAtLoc
+  placeAtNode as atNode
 } from 'ast-loc-utils'
 
 normalizeTryStatement(node, path): void ->

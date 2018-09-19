@@ -5,7 +5,7 @@ isIndexedPlaceholderPath(phPath) -> (phPath.node.index)~looseNotEq(null)
 isSpreadPlaceholderPath(phPath) -> phPath.parentPath?.node.type == "SpreadElement"
 isNonIndexedPlaceholderPath(phPath) -> (phPath.node.index)~looseEq(null) and (not phPath~isSpreadPlaceholderPath())
 
-registerPlaceholder(functions, path, programPath) ->
+registerPlaceholder(functions, path) ->
   fnPath = path~getFunctionParent()
   if !fnPath || !fnPath.node || !fnPath.node.params:
     throw path.buildCodeFrameError("Placeholders cannot be used outside functions.")

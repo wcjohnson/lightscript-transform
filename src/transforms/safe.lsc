@@ -2,8 +2,7 @@ import t, { isa } from '../types'
 import { hoistRef, isSimple } from '../helpers/variables'
 
 import {
-  getLoc, placeAtNode as atNode,
-  placeTreeAtLocWhenUnplaced as allAtLoc
+  placeAtNode as atNode
 } from 'ast-loc-utils'
 
 // Optional-replacement algorithm based on babel-plugin-transform-optional-chaining
