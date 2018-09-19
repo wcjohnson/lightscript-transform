@@ -1,7 +1,7 @@
 f(...args) -> args
 o = {
   a: 2
-  m() => this
+  m() => o
   g(x) -> x + 1
 }
 
