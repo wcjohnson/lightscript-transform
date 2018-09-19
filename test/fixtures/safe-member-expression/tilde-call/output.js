@@ -1,1 +1,3 @@
-a == null ? void 0 : c(a.b);
+var _ref;
+
+(_ref = a?.b) != null ? c(_ref) : void 0;
