@@ -1,6 +1,4 @@
 (() => {
-  var _ref;
-
   const _arr = [1, 2];
 
   for (let _arr2 = ["buckle", "my", "shoe"], _i = 0, _len = _arr2.length; _i < _len; _i++) {
@@ -9,7 +7,7 @@
     _arr.push(e);
   }
 
-  _arr.push(...(_ref = true ? [3] : void 0, _ref === void 0 ? [] : _ref), 4);
+  _arr.push(...(true ? [3] : []), 4);
 
   for (let _arr3 = ["shut", "the", "door"], _i2 = 0, _len2 = _arr3.length; _i2 < _len2; _i2++) {
     const e = _arr3[_i2];

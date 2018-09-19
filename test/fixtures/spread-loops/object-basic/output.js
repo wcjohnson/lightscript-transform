@@ -1,5 +1,3 @@
-var _ref;
-
 (() => {
   const _obj = {};
 
@@ -24,7 +22,7 @@ var _ref;
 
 ({
   a: b,
-  ...(_ref = c ? {
+  ...(c ? {
     d: e
-  } : void 0, _ref === void 0 ? [] : _ref)
+  } : void 0)
 });
