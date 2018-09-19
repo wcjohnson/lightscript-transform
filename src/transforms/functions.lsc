@@ -1,14 +1,15 @@
 import { isa } from "../types"
 import { addImplicitReturns } from "../helpers/functions"
-import { getScopeParent } from "../helpers/blocks"
+import { getFunctionScopeParent } from "../helpers/blocks"
 
 export enterFunction(path): void ->
   if path.node~isa("FunctionDeclaration"):
-    // This is needed because named arrow declarations are new in
-    // Lightscript and therefore not acknowledged by Babel's default
-    // traversal algorithm for assessing declarations. We must
-    // register the declaration by hand here.
-    scopeParent = getScopeParent(path)
+    // Possible Babel bug: Babel considers function declarations to be
+    // block scoped per:
+    // https://github.com/babel/babel/blob/eac4c5bc17133c2857f2c94c1a6a8643e3b547a7/packages/babel-types/src/validators/isBlockScoped.js
+    //
+    // But they are actually function scoped.
+    scopeParent = path~getFunctionScopeParent()
     scopeParent.scope.registerDeclaration(path)
 
 export exitFunction(path): void ->

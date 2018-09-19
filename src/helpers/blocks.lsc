@@ -122,6 +122,11 @@ export getScopeParent(path) ->
     path.isFunction() or path.isBlockStatement() or path.isProgram()
   )
 
+export getFunctionScopeParent(path) ->
+  path.findParent((path) ->
+    path.isFunction() or path.isProgram()
+  )
+
 export iife(body, async = false) ->
   actualBody = if Array.isArray(body):
     bodyLoc = getSurroundingLoc(body)
