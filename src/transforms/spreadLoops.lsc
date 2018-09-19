@@ -242,7 +242,7 @@ export transformSafeSpreadElement(path) ->
   // Optimization: if spreading an `IfExpr` without an alternate, just add
   // `[]` as an alternate if consequent is an array
   if (
-    argument~isa("IfExpression") and
+    argument~isa("LscIfExpression") and
     argument.consequent~isa("ArrayExpression") and
     (not argument.alternate)
   ):
