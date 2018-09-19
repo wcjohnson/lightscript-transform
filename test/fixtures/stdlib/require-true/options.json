@@ -1,9 +1,7 @@
 {
   "plugins": [
-    ["lightscript", {
-      "stdlib": {
-        "require": true
-      }
+    ["@lightscript/transform", {
+      "useRequire": true
     }]
   ]
 }

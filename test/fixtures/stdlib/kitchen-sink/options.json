@@ -1,6 +1,6 @@
 {
   "plugins": [
-    ["lightscript", {
+    ["@lightscript/transform", {
       "stdlib": {
         "PropTypes": "react",
         "redux": "redux *"

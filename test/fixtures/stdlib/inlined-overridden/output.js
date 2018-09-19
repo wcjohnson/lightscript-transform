@@ -1,3 +1,5 @@
 function looseEq(a) {
   return a;
-}looseEq(1);
+}
+
+looseEq(1);

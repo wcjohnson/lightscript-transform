@@ -1,1 +1,2 @@
-import uniq from "lodash/uniq";uniq();
+import uniq from "lodash/uniq";
+uniq();
