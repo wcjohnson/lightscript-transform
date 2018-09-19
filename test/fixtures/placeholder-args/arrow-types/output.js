@@ -1,5 +1,3 @@
-var _obj;
-
 (function (_arg) {
   return _arg;
 });
@@ -26,7 +24,9 @@ function* gg(_arg8) {
   return _arg8;
 }
 
-gg = gg.bind(this)async function* fga(_arg9) {
+gg = gg.bind(this)
+
+async function* fga(_arg9) {
   return _arg9;
 }
 
@@ -34,17 +34,18 @@ async function* gga(_arg10) {
   return _arg10;
 }
 
-_obj = {
+({
   h(_arg11) {
     return _arg11;
   },
-  i(_arg12) {
+
+  i: (_arg12) => {
     return _arg12;
   },
   j: function (_arg13) {
     return _arg13;
   }
-}, _obj.i = _obj.i.bind(_obj), _obj;
+});
 
 class X {
   constructor() {
@@ -54,7 +55,9 @@ class X {
   k(_arg14) {
     return _arg14;
   }
+
   l(_arg15) {
     return _arg15;
   }
+
 }
