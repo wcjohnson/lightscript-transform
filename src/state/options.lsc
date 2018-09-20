@@ -69,8 +69,8 @@ export class Options:
     this.state = state
 
   setOptions(babelOpts, parserOpts, lscOpts): void ->
-    this.babelOpts = babelOpts
-    this.parserOpts = parserOpts
+    this.babelOpts = babelOpts or {}
+    this.parserOpts = parserOpts or {}
     this.lscOpts = Object.assign({}, lscOpts or {})
 
     this.fileTypeInfo = getFileTypeInfo(babelOpts.filename)
@@ -84,7 +84,7 @@ export class Options:
       this.isLightScript = false
 
   setPreParseOptions(parserOpts, configurationDirectives): void ->
-    this.parserOpts = parserOpts
+    this.parserOpts = parserOpts or this.parserOpts
 
     // Merge config directives into lsc options
     this.configurationDirectives = configurationDirectives
@@ -104,7 +104,6 @@ export class Options:
     plugins~addParserPlugin("classProperties")
     plugins~addParserPlugin("optionalCatchBinding")
     plugins~addParserPlugin("optionalChaining")
-    plugins~addParserPlugin("decorators-legacy")
     plugins~addParserPlugin("throwExpressions")
 
     // Mandatory LightScript plugins

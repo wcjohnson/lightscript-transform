@@ -4,11 +4,6 @@ const obj = (() => {
       return b;
     },
 
-    @decorated
-    c() {
-      return d;
-    },
-
     regular: "entry",
     e: () => {
       return f;
