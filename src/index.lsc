@@ -1,4 +1,8 @@
 import { CompilerState } from './state'
+import types from './types'
+import * as parser from '@lightscript/parser'
+import traverse from '@babel/traverse'
+import * as tooling from './tooling'
 
 export default LightScript(babel) ->
   plugin = {
@@ -17,3 +21,10 @@ export default LightScript(babel) ->
         compilerState.visitProgram(path, state)
     }
   }
+
+export {
+  types
+  parser
+  traverse
+  tooling
+}
