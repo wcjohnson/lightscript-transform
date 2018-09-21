@@ -199,6 +199,7 @@ export registerLightscriptNodeTypes(t): void ->
   if not t.hasType("LscNamedArrowMemberExpression"):
     definePluginType("LscNamedArrowMemberExpression", {
       inherits: "LscNamedArrowExpression",
+      visitor: ["object", "id", "params", "body", "returnType", "typeParameters"],
       fields: {  // c/p from NamedArrowExpression except for `object`
         id: {
           validate: assertNodeType("Identifier"),
@@ -280,13 +281,8 @@ export registerLightscriptNodeTypes(t): void ->
   if not t.hasType("LscMatchCase"):
     definePluginType("LscMatchCase", {
       builder: ["outerGuard", "atoms", "binding", "assertive", "innerGuard", "consequent"],
-      visitor: ["test", "outerGuard", "atoms", "binding", "innerGuard", "consequent"],
+      visitor: ["outerGuard", "atoms", "binding", "innerGuard", "consequent"],
       fields: {
-        // XXX: v3 compatibility, remove when syntax settles
-        test: {
-          validate: assertNodeType("Expression", "MatchElse")
-          optional: true
-        }
         outerGuard: {
           validate: assertNodeType("Expression", "MatchElse")
           optional: true
