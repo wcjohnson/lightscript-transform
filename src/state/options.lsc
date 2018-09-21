@@ -47,6 +47,7 @@ getFileTypeInfo(filename) ->
 
   if (
     filename === "<input>" or // eslint
+    filename === "<text>" or // eslint
     filename === "repl" or // babel-node
     filename.includes(".lsc")
   ): return { isLightScript: true, isLSX: false }
