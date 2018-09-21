@@ -3,6 +3,7 @@
 import { Options } from './state/options'
 import parseConfigurationDirectives from './util/parseConfigurationDirectives'
 import * as parser from "@lightscript/parser"
+import { everyLodashMethod } from './state/imports'
 
 findBabelConfig = require('find-babel-config')
 
@@ -59,3 +60,9 @@ export getCompilerConfiguration(filePath, code, opts = {}) ->
 // the same way the compiler does. Returns a babylon ast.
 export parse(code, compilerConfig) ->
   parser.parse(code, compilerConfig.getParserOptions())
+
+// Linter needs to know about implicit lodash imports
+export isPotentialImplicitLodashImport(compilerConfig, name): boolean ->
+  if compilerConfig.lodashEnabled():
+    if everyLodashMethod[name]: return true
+  false
