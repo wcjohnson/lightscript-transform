@@ -97,6 +97,10 @@ export class Options:
     opts = Object.assign({}, this.parserOpts)
     delete opts.lscCompiler // not needed in parser
     opts.plugins = (opts.plugins or []).slice()
+
+    // Don't alter parser plugins if file is not LSC.
+    if not this.isLightScript: return opts
+
     plugins = opts.plugins
 
     plugins~addParserPlugin("objectRestSpread")
@@ -126,10 +130,23 @@ export class Options:
 
     opts
 
-  inlinedOperatorsEnabled() ->
+  inlinedOperatorsEnabled(): boolean ->
+    if not this.isLightScript: return false
     opts = this.lscOpts
     not ((opts.stdlib === false) or (typeof opts.stdlib === "object" && opts.stdlib.lightscript === false))
 
   placeholderArgsEnabled(): boolean ->
     opts = this.lscOpts
     opts.placeholderArgs
+
+  lodashEnabled(): boolean ->
+    if not this.isLightScript: return false
+    { lscOpts: opts } = this
+
+    if typeof(opts.stdlib) == "object":
+      if opts.stdlib.lodash != false:
+        return true
+    elif opts.stdlib != false:
+        return true
+
+    false
