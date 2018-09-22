@@ -1,3 +1,5 @@
+import { PluginList } from '@lightscript/parser'
+
 export compilerOptions = {
   stdlib: {
     description: "Configure the LightScript standard library"
@@ -58,17 +60,6 @@ getFileTypeInfo(filename) ->
 
   return { isLightScript: false, isLSX: false }
 
-addParserPlugin(plugins, plugin) ->
-  pluginName = if Array.isArray(plugin): plugin[0] else: plugin
-
-  for elem e in plugins:
-    if Array.isArray(e):
-      if e[0] == pluginName: return
-    else:
-      if e == pluginName: return
-
-  plugins.push(plugin)
-
 export class Options:
   constructor(state) ->
     this.state = state
@@ -101,37 +92,53 @@ export class Options:
 
     opts = Object.assign({}, this.parserOpts)
     delete opts.lscCompiler // not needed in parser
-    opts.plugins = (opts.plugins or []).slice()
 
     // Don't alter parser plugins if file is not LSC.
     if not this.isLightScript: return opts
 
-    plugins = opts.plugins
+    pluginList = new PluginList()
+    pluginList.addPlugins(opts.plugins or [])
 
-    plugins~addParserPlugin("objectRestSpread")
-    plugins~addParserPlugin("asyncGenerators")
-    plugins~addParserPlugin("classProperties")
-    plugins~addParserPlugin("optionalCatchBinding")
-    plugins~addParserPlugin("optionalChaining")
-    plugins~addParserPlugin("throwExpressions")
+    // Don't alter parser plugins if file is not LSC.
+    if not this.isLightScript: return opts
+
+    pluginList.addPlugin("objectRestSpread")
+    pluginList.addPlugin("asyncGenerators")
+    pluginList.addPlugin("classProperties")
+    pluginList.addPlugin("optionalCatchBinding")
+    pluginList.addPlugin("optionalChaining")
+    pluginList.addPlugin("throwExpressions")
+
+    // Decorator plugin (attempt to duplicate configuration from the preset)
+    if pluginOpts.decoratorOpts:
+      if pluginOpts.decoratorOpts.legacy:
+        pluginList.addPlugin("decorators-legacy")
+      else:
+        pluginList.addPlugin(["decorators", { decoratorsBeforeExport: pluginOpts.decoratorOpts.decoratorsBeforeExport }])
+    else:
+      // Enable legacy decorators by default
+      pluginList.addPlugin("decorators-legacy")
+
 
     // Mandatory LightScript plugins
-    plugins.push(
+    pluginList.addPlugins([
       "tryCatch", "tildeCall", "disableBitwiseOperators"
       "significantWhitespace", "modifiedLogicalOperators", "seqExprRequiresParen",
       "lscCoreSyntax", "lscIf", "lscIfExpression", "lscTryExpression"
       "lscAssignment", "lscArrows", "lscForIn", "awaitArrow", "safeAwaitArrow",
       "spreadLoop", "questionSubscripts", "match"
-    )
+    ])
 
     // Optional plugins
-    if not pluginOpts.disableJsx: plugins~addParserPlugin("jsx")
-    if not pluginOpts.disableFlow: plugins~addParserPlugin("flow")
-    if pluginOpts.bangCall != false: plugins.push("bangCall")
-    if pluginOpts.flippedImports: plugins.push("flippedImports")
-    if pluginOpts.placeholderArgs: plugins.push("syntacticPlaceholders")
+    if not pluginOpts.disableJsx: pluginList.addPlugin("jsx")
+    if not pluginOpts.disableFlow: pluginList.addPlugin("flow")
+    if pluginOpts.bangCall != false: pluginList.addPlugin("bangCall")
+    if pluginOpts.flippedImports: pluginList.addPlugin("flippedImports")
+    if pluginOpts.placeholderArgs: pluginList.addPlugin("syntacticPlaceholders")
     if pluginOpts.placeholder:
       opts.placeholder = pluginOpts.placeholder
+
+    opts.plugins = pluginList.toBabelPluginList()
 
     opts
 
