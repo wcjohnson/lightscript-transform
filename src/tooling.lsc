@@ -20,7 +20,7 @@ tryConfigEntries(babelConfig, list) ->
   let x
   for elem [ type, pluginName ] in list:
     now x = findConfigEntry(babelConfig, type, pluginName)
-    if x: return { source: babelConfig, config: x }
+    if x: return { source: type, config: x }
   { config: {} }
 
 // Given a file path, locate the applicable .babelrc and extract the options
@@ -43,7 +43,12 @@ export getPluginConfig(babelConfig) ->
 // Obtain compiler configuration information using the same algorithms used
 // by the compiler itself. Loads .babelrc and configuration directives.
 export getCompilerConfiguration(filePath, code, opts = {}, underride = {}) ->
-  { config } = getPluginConfig(locateBabelConfig(filePath))
+  { config, source } = getPluginConfig(locateBabelConfig(filePath))
+
+  // Apply default preset decorator config
+  if source == "presets":
+    if not config.decoratorOpts:
+      config.decoratorOpts = { legacy: true }
 
   // Merge special opts
   for key k, val v in opts:
