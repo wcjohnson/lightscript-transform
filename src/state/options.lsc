@@ -40,6 +40,17 @@ export compilerOptions = {
     description: "Don't parse Flow type annotations."
     valueType: "boolean"
   }
+  _decoratorParsing: {
+    description: "Override decorator parsing. (For diagnostic purposes only; in an ordinary build chain you would use the preset to configure decorator parsing.)"
+    valueType: "options"
+    options: [
+      "none"
+      "legacy"
+      "decoratorsBeforeExport"
+      "noDecoratorsBeforeExport"
+    ]
+    defaultValue: "legacy"
+  }
 }
 
 export isNonceFilename(filename) ->
@@ -115,6 +126,15 @@ export class Options:
         pluginList.addPlugin("decorators-legacy")
       else:
         pluginList.addPlugin(["decorators", { decoratorsBeforeExport: pluginOpts.decoratorOpts.decoratorsBeforeExport }])
+    elif pluginOpts._decoratorParsing:
+      // Diagonstic option
+      match pluginOpts._decoratorParsing:
+        | "legacy": pluginList.addPlugin("decorators-legacy")
+        | "decoratorsBeforeExport":
+          pluginList.addPlugin(["decorators", { decoratorsBeforeExport: true }])
+        | "noDecoratorsBeforeExport":
+          pluginList.addPlugin(["decorators", { decoratorsBeforeExport: false }])
+        | else: null
     else:
       // Enable legacy decorators by default
       pluginList.addPlugin("decorators-legacy")
