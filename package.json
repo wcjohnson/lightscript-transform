@@ -20,7 +20,7 @@
     "test:only": "jest",
     "test:debug": "node --inspect-brk $(npm bin)/jest -i --env jest-environment-node-debug",
     "lint": "eslint --ext .js,.lsc src",
-    "preversion": "npm run test"
+    "preversion": "run-s test"
   },
   "dependencies": {
     "@lightscript/parser": "4.0.0-alpha.1",
