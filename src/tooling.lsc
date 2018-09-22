@@ -16,12 +16,12 @@ findConfigEntry(babelConfig, type, pluginName) ->
       return p[1]
 
 tryConfigEntries(babelConfig, list) ->
-  if not babelConfig: return {}
+  if not babelConfig: return { config: {} }
   let x
   for elem [ type, pluginName ] in list:
     now x = findConfigEntry(babelConfig, type, pluginName)
-    if x: return x
-  {}
+    if x: return { source: babelConfig, config: x }
+  { config: {} }
 
 // Given a file path, locate the applicable .babelrc and extract the options
 // pertinent to the LightScript plugin.
@@ -42,16 +42,19 @@ export getPluginConfig(babelConfig) ->
 
 // Obtain compiler configuration information using the same algorithms used
 // by the compiler itself. Loads .babelrc and configuration directives.
-export getCompilerConfiguration(filePath, code, opts = {}) ->
-  pluginOpts = getPluginConfig(locateBabelConfig(filePath))
+export getCompilerConfiguration(filePath, code, opts = {}, underride = {}) ->
+  { config } = getPluginConfig(locateBabelConfig(filePath))
 
   // Merge special opts
   for key k, val v in opts:
     if (k != "preset" and k != "plugin"):
-      pluginOpts[k] = v
+      config[k] = v
+
+  for key k, val v in underride:
+    if not config[k]: config[k] = v
 
   compilerOpts = new Options(null)
-  compilerOpts.setOptions({ filename: filePath }, opts.parserOpts, pluginOpts)
+  compilerOpts.setOptions({ filename: filePath }, opts.parserOpts, config)
   directiveOpts = parseConfigurationDirectives(code)
   compilerOpts.setPreParseOptions(null, directiveOpts)
 
