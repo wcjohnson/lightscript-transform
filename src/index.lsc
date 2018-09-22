@@ -22,9 +22,6 @@ export default LightScript(babel) ->
     }
   }
 
-export {
-  types
-  parser
-  traverse
-  tooling
-}
+api = { types, parser, traverse, tooling }
+
+export { api }
