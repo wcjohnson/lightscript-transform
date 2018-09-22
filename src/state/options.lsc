@@ -6,10 +6,8 @@ export compilerOptions = {
   }
   patternMatching: {
     description: "Test and branch using `match` keyword"
-    valueType: "option"
-    options: [false, "default"]
-    defaultValue: "default"
-    stage: "1"
+    valueType: "boolean"
+    defaultValue: true
   }
   bangCall: {
     description: "Call functions with paren-free syntax using `!`"
@@ -146,12 +144,13 @@ export class Options:
       "significantWhitespace", "modifiedLogicalOperators", "seqExprRequiresParen",
       "lscCoreSyntax", "lscIf", "lscIfExpression", "lscTryExpression"
       "lscAssignment", "lscArrows", "lscForIn", "awaitArrow", "safeAwaitArrow",
-      "spreadLoop", "questionSubscripts", "match"
+      "spreadLoop", "questionSubscripts"
     ])
 
     // Optional plugins
     if not pluginOpts.disableJsx: pluginList.addPlugin("jsx")
     if not pluginOpts.disableFlow: pluginList.addPlugin("flow")
+    if pluginOpts.patternMatching != false: pluginList.addPlugin("match")
     if pluginOpts.bangCall != false: pluginList.addPlugin("bangCall")
     if pluginOpts.flippedImports: pluginList.addPlugin("flippedImports")
     if pluginOpts.placeholderArgs: pluginList.addPlugin("syntacticPlaceholders")
