@@ -1,9 +1,10 @@
 // API for external tools, such as the linter, that share functionality with
 // the compiler.
-import { Options } from './state/options'
+import { Options, compilerOptions, isNonceFilename } from './state/options'
 import parseConfigurationDirectives from './util/parseConfigurationDirectives'
 import * as parser from "@lightscript/parser"
 import { everyLodashMethod } from './state/imports'
+import packageMetadata from '../package.json'
 
 findBabelConfig = require('find-babel-config')
 
@@ -26,8 +27,8 @@ tryConfigEntries(babelConfig, list) ->
 // pertinent to the LightScript plugin.
 export locateBabelConfig(filePath) ->
   // Check if filePath is nonsense
-  if (not filePath) or filePath == "unknown" or filePath == "repl":
-    return null
+  if filePath~isNonceFilename(): return null
+
   // Use find-babel-config
   confData = findBabelConfig.sync(filePath)
   confData.config
@@ -60,6 +61,17 @@ export getCompilerConfiguration(filePath, code, opts = {}) ->
 // the same way the compiler does. Returns a babylon ast.
 export parse(code, compilerConfig) ->
   parser.parse(code, compilerConfig.getParserOptions())
+
+// Export medatada in lscdiag format
+export getCompilerMetadata() -> {
+  metadataVersion: 4
+  name: packageMetadata.name
+  version: packageMetadata.version
+  parser
+  parse
+  getCompilerConfiguration
+  options: compilerOptions
+}
 
 // Linter needs to know about implicit lodash imports
 export isPotentialImplicitLodashImport(compilerConfig, name): boolean ->

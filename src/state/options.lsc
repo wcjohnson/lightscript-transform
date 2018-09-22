@@ -40,15 +40,19 @@ export compilerOptions = {
   }
 }
 
+export isNonceFilename(filename) ->
+  (not filename) or
+  filename === "<input>" or // eslint
+  filename === "<text>" or // eslint
+  filename === "repl"// babel-node
+
 getFileTypeInfo(filename) ->
   if not filename: return { isLightScript: true, isLSX: false }
 
   if filename.includes(".lsx"): return { isLightScript: true, isLSX: true }
 
   if (
-    filename === "<input>" or // eslint
-    filename === "<text>" or // eslint
-    filename === "repl" or // babel-node
+    filename~isNonceFilename() or // Assume unknown text is LightScript
     filename.includes(".lsc")
   ): return { isLightScript: true, isLSX: false }
 
