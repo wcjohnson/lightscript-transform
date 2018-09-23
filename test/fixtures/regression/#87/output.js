@@ -1,0 +1,1 @@
+const presets = [...(opts.env !== false ? [['@babel/preset-env', opts.env || {}]] : [])];

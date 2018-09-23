@@ -229,6 +229,17 @@ export maybeTransformArrayWithSpreadLoops(path) ->
 
   false
 
+isArrayishConsequent(node) ->
+  node~isa("ArrayExpression") or
+  // An arrayish consequent may have been lengthened by the
+  // parser into a BlockStatement.
+  (
+    node~isa("BlockStatement") and
+    node.body.length == 1 and
+    node.body[0]~isa("ExpressionStatement") and
+    node.body[0].expression~isa("ArrayExpression")
+  )
+
 export transformSafeSpreadElement(path) ->
   // Prevent infinite recursion
   if path.node._safe: return
@@ -243,7 +254,7 @@ export transformSafeSpreadElement(path) ->
   // `[]` as an alternate if consequent is an array
   if (
     argument~isa("LscIfExpression") and
-    argument.consequent~isa("ArrayExpression") and
+    argument.consequent~isArrayishConsequent() and
     (not argument.alternate)
   ):
     argument.alternate = t.arrayExpression()
