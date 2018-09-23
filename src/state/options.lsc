@@ -93,7 +93,8 @@ export class Options:
 
     // Merge config directives into lsc options
     this.configurationDirectives = configurationDirectives
-    if configurationDirectives.isLightScript: this.isLightScript = true
+    if configurationDirectives.isLightScript~looseNotEq(null):
+      this.isLightScript = configurationDirectives.isLightScript
     this.lscOpts = Object.assign(this.lscOpts, this.configurationDirectives)
 
   getParserOptions() ->

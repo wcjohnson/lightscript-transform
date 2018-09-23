@@ -53,18 +53,20 @@ getWithOptions(opts, wc) ->
   for elem clause in clauses:
     getClauseOptions(opts, clause)
 
+parseMatchingConfigurationDirective(matches, result): boolean ->
+  if matches:
+    if matches[1]: getWithOptions(result, matches[1])
+    if result.isLightScript~looseEq(null): result.isLightScript = true
+    true
+  else:
+    false
+
 parseConfigurationDirective(directive, result): void ->
   let matches = directive.match(/^use @oigroup\/lightscript\s*(?:with ([^]*))?$/)
-  if matches:
-    result.isLightScript = true
-    if matches[1]: getWithOptions(result, matches[1])
-    return
+  if parseMatchingConfigurationDirective(matches, result): return
 
   now matches = directive.match(/^lang lightscript\s*(?:with ([^]*))?$/)
-  if matches:
-    result.isLightScript = true
-    if matches[1]: getWithOptions(result, matches[1])
-    return
+  if parseMatchingConfigurationDirective(matches, result): return
 
 export default parseConfigurationDirectives(code) ->
   result = {}
