@@ -85,8 +85,9 @@ export default main(state, path): void ->
     ForInStatement(path): void ->
       maybeTransformAutoConstDeclaration(path)
 
-    LscTryExpression(path): void ->
-      transformTryExpression(path)
+    LscTryExpression: {
+      exit(path): void -> transformTryExpression(path)
+    }
 
     TryStatement(path): void ->
       transformTryStatement(path)
