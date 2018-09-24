@@ -28,7 +28,6 @@ export getTails(path, allowLoops) ->
     | ~isa("TryStatement"):
       add(path.get("block"))
       add(path.get("handler"))
-      add(path.get("finalizer"))
     | ~isa("CatchClause"):
       add(path.get("body"))
     | ~isa("LscMatchStatement"):
