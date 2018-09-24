@@ -3,7 +3,7 @@
 import { Options, compilerOptions, isNonceFilename } from './state/options'
 import parseConfigurationDirectives from './util/parseConfigurationDirectives'
 import * as parser from "@lightscript/parser"
-import { everyLodashMethod } from './state/imports'
+import { lodashMethodMap, inlinedOperatorMap } from './state/imports'
 import packageMetadata from '../package.json'
 
 findBabelConfig = require('find-babel-config')
@@ -81,8 +81,13 @@ export getCompilerMetadata() -> {
   options: compilerOptions
 }
 
-// Linter needs to know about implicit lodash imports
+// Linter needs to know about implicit imports
 export isPotentialImplicitLodashImport(compilerConfig, name): boolean ->
   if compilerConfig.lodashEnabled():
-    if everyLodashMethod[name]: return true
+    if lodashMethodMap[name]: return true
+  false
+
+export isPotentialInlinedOperator(compilerConfig, name): boolean ->
+  if compilerConfig.inlinedOperatorsEnabled():
+    if inlinedOperatorMap[name]: return true
   false

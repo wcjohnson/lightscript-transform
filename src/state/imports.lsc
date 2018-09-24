@@ -383,3 +383,19 @@ export const everyLodashMethod = [
   "zipObjectDeep",
   "zipWith",
 ];
+
+export lodashMethodMap = {...for elem k in everyLodashMethod: {[k]: true}}
+
+export everyInlinedOperator = [
+  "looseEq"
+  "looseNotEq"
+  "bitwiseNot"
+  "bitwiseAnd"
+  "bitwiseOr"
+  "bitwiseXor"
+  "bitwiseLeftShift"
+  "bitwiseRightShift"
+  "bitwiseZeroFillRightShift"
+]
+
+export inlinedOperatorMap = {...for elem k in everyInlinedOperator: {[k]: true}}
