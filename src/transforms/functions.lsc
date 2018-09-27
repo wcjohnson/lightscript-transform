@@ -4,11 +4,9 @@ import { getFunctionScopeParent } from "../helpers/blocks"
 
 export enterFunction(path): void ->
   if path.node~isa("FunctionDeclaration"):
-    // Possible Babel bug: Babel considers function declarations to be
-    // block scoped per:
-    // https://github.com/babel/babel/blob/eac4c5bc17133c2857f2c94c1a6a8643e3b547a7/packages/babel-types/src/validators/isBlockScoped.js
-    //
-    // But they are actually function scoped.
+    // XXX: In ES2015, functions are block scoped.
+    // This code is scoping them like pre-ES2015.
+    // LightScript should probably obey the newer standard, as Babel-core does
     scopeParent = path~getFunctionScopeParent()
     scopeParent.scope.registerDeclaration(path)
 
