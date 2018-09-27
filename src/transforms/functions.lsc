@@ -1,14 +1,20 @@
 import { isa } from "../types"
-import { addImplicitReturns } from "../helpers/functions"
-import { getFunctionScopeParent } from "../helpers/blocks"
+import { addImplicitReturns , isNamedArrowFunction} from "../helpers/functions"
+import { getFunctionScopeParent, toBlockStatement } from "../helpers/blocks"
 
 export enterFunction(path): void ->
-  if path.node~isa("FunctionDeclaration"):
+  { node } = path
+  if node~isa("FunctionDeclaration"):
     // XXX: In ES2015, functions are block scoped.
     // This code is scoping them like pre-ES2015.
     // LightScript should probably obey the newer standard, as Babel-core does
     scopeParent = path~getFunctionScopeParent()
     scopeParent.scope.registerDeclaration(path)
+
+  // Blockify function bodies where needed
+  if node~isa("Method") and node~isNamedArrowFunction!:
+    path.get("body").replaceWith(node.body~toBlockStatement!)
+
 
 export exitFunction(path): void ->
   addImplicitReturns(path)
