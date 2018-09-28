@@ -68,9 +68,6 @@ transformPessimizedTryExpression(path): void ->
 
     YieldExpression(yieldPath) ->
       throw yieldPath.buildCodeFrameError("`yield` is not allowed in `try` expressions.")
-
-    ReturnStatement(returnPath) ->
-      throw returnPath.buildCodeFrameError("`return` is not allowed in `try` expressions.");
   })
 
   node.type = "TryStatement"
