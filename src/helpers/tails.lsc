@@ -1,5 +1,6 @@
 import { isa } from '../types'
 import { toStatement } from './blocks'
+import { toClassExpression } from './classes'
 import { isDestructuringPattern, toRestructureExpression } from './restructure'
 
 // c/p babel-traverse/src/path/family.js getCompletionRecords
@@ -60,4 +61,9 @@ export transformTails(path, allowLoops, allowExprs, getNewNode) ->
       | ~isa("FunctionDeclaration"):
         tailPath.insertAfter(toStatement(getNewNode(tailPath.node.id, tailPath)))
       | ~isa("ClassDeclaration"):
-        tailPath.insertAfter(toStatement(getNewNode(tailPath.node.id, tailPath)))
+        if not tailPath.node.id:
+          // Anonymous class declaration gets replaced with ClassExpression
+          tailPath.replaceWith(toStatement(getNewNode(tailPath.node~toClassExpression(), tailPath)))
+        else:
+          // Named class declaration gets
+          tailPath.insertAfter(toStatement(getNewNode(tailPath.node.id, tailPath)))

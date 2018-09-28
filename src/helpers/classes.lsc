@@ -1,0 +1,11 @@
+import t, { isa } from '../types'
+import { placeAtNode as atNode } from 'ast-loc-utils'
+
+export toClassExpression(node) ->
+  newNode = t.ClassExpression(node.id, node.superClass, node.body, node.decorators)~atNode(node)
+  newNode.implements = node.implements
+  newNode.mixins = node.mixins
+  newNode.superTypeParameters = node.superTypeParameters
+  newNode.typeParameters = node.typeParameters
+
+  newNode
