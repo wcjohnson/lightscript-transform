@@ -6,13 +6,22 @@ import getLoc from 'ast-loc-utils/lib/getLoc'
 import atNode from 'ast-loc-utils/lib/placeAtNode'
 import atLoc from 'ast-loc-utils/lib/placeAtLoc'
 
+// Determine if the given node has an annotation which would elide
+// implicit returns
+shouldElideImplicitReturns(node) ->
+  // Don't add implicit returns to constructors, setters
+  if node.kind === "constructor" or node.kind === "set": return true
+  // Look at type annotations
+  if not node.returnType: return false
+  // f(): void -> body
+  if node.returnType.typeAnnotation~isa("VoidTypeAnnotation"): return true
+  false
+
 // Add "return" statements to all expressions in tail position inside the
 // body of the function at the given Babel traversal path.
 export addImplicitReturns(functionPath) ->
   node = functionPath.node
-  // Don't add implicit returns to constructors, setters, or :void functions
-  if node.kind === "constructor" or node.kind === "set": return
-  if node.returnType?.typeAnnotation~isa("VoidTypeAnnotation"): return
+  if node~shouldElideImplicitReturns(): return
 
   // Implicit return transformations
   transform(expr, path) ->
