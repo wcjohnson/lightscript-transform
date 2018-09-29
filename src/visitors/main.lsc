@@ -12,11 +12,15 @@ import { transformAssignmentExpression } from "../transforms/assignments"
 import { transformAwaitExpression, transformSafeAwaitExpression } from "../transforms/await"
 import { transformMatchExpression, transformMatchStatement } from "../transforms/match"
 import { transformAllPlaceholders } from "../transforms/placeholders"
+import scopeFix from './scope'
 
 export default main(state, path): void ->
   // Placeholders must be transformed first
   if state.options.placeholderArgsEnabled():
     transformAllPlaceholders(path)
+
+  // Fix babel scope
+  scopeFix(state, path)
 
   path.traverse({
     Function: {

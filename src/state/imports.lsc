@@ -51,7 +51,7 @@ export class Imports:
     name = path.node.name
 
     if symbols[name]:
-      if not path~pathHasVariable(name):
+      if not path.scope.hasBinding(name):
         this.addDefaultImport(name, symbols[name])
 
   addDefaultImport(name, importPath) ->

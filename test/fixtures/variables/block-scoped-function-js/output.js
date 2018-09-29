@@ -3,5 +3,5 @@ if (true) {
 }
 
 if (true) {
-  x = 1;
+  const x = 1;
 }

@@ -1,0 +1,13 @@
+// Fix mismatches with Babel's scoping algorithm
+
+import { getBlockScopeParent } from "../helpers/blocks"
+
+export default scopeFix(state, path): void ->
+  path.traverse({
+    LscNamedArrowDeclaration(path) ->
+      // XXX: Despite the block scoping fix, this code is still necessary because
+      // Babel doesn't see `LscNamedArrowDeclarations` as function declarations.
+      // This is in turn caused by @babel/types' hard-coded validator functions.
+      scopeParent = path~getBlockScopeParent()
+      scopeParent.scope.registerBinding("hoisted", path.get("id"), path)
+  })
