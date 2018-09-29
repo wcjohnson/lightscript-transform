@@ -1,9 +1,19 @@
 import t, { isa } from '../types'
 
+import { getScopeParent } from "./blocks"
+
 import getLoc from "ast-loc-utils/lib/getLoc"
 import atLoc from 'ast-loc-utils/lib/placeAtLoc'
 import atNode from 'ast-loc-utils/lib/placeAtNode'
 import span from 'ast-loc-utils/lib/span'
+
+// Determine if a variable name is in scope
+export scopeHasVariable(scope, name) ->
+  scope and
+  scope.hasBinding(name)
+
+export pathHasVariable(path, name) ->
+  scopeHasVariable(path~getScopeParent().scope, name)
 
 export isSimple(refTarget) ->
   refTarget~isa("Identifier") or

@@ -1,6 +1,5 @@
 import t from '../types'
-import { getScopeParent } from "../helpers/blocks"
-import { checkFalsePositiveReference } from "../helpers/variables"
+import { checkFalsePositiveReference, pathHasVariable } from "../helpers/variables"
 
 buildRequireStatement(name, importPath) ->
   // const [name] = require("[path]")
@@ -52,8 +51,7 @@ export class Imports:
     name = path.node.name
 
     if symbols[name]:
-      parentScope = path~getScopeParent()
-      if parentScope?.scope and (not parentScope.scope.hasBinding(name)):
+      if not path~pathHasVariable(name):
         this.addDefaultImport(name, symbols[name])
 
   addDefaultImport(name, importPath) ->
