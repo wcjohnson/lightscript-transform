@@ -4,4 +4,4 @@ import * as tooling from './tooling'
 import traverse from '@babel/traverse'
 import { addImplicitReturns } from './helpers/functions'
 
-export { types, is, isa, parser, tooling, traverse }
+export { types, is, isa, parser, tooling, traverse, addImplicitReturns }
