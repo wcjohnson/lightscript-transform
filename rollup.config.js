@@ -49,6 +49,7 @@ var withFormat = (format) => ({
   output: {
     file: format === "cjs" ? `lib/index.js` : `lib/index.${format}.js`,
     format: format,
+    exports: 'named',
     sourcemap: true
   },
   plugins: getPlugins(),
