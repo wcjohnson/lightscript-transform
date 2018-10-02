@@ -8,6 +8,7 @@ import { isDestructuringPattern, toRestructureExpression } from './restructure'
 // Locate all Babel traversal paths that are in tail position with
 // respect to the node at the given starting path.
 export getTails(path, allowLoops) ->
+  if not path: return []
   node = path.node
   let paths = []
 
