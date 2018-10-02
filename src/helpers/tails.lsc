@@ -33,19 +33,17 @@ export getTails(path, allowLoops) ->
       add(path.get("body"))
     | ~isa("LscMatchStatement"):
       for idx i in node.cases:
-        add(path.get(`cases.${i}.consequent`))
+        add(path.get('cases')[i].get('consequent'))
     | else:
       paths.push(path)
 
   paths
 
-export transformTails(path, allowLoops, allowExprs, getNewNode) ->
+export transformTails(path, allowLoops, getNewNode) ->
   tailPaths = getTails(path, allowLoops)
 
   for elem tailPath in tailPaths:
     match tailPath:
-      | if allowExprs when ~isa("Expression"):
-        tailPath.replaceWith(getNewNode(tailPath.node, tailPath))
       | ~isa("ExpressionStatement"):
         tailPath.replaceWith(getNewNode(tailPath.node.expression, tailPath)~toStatement())
       | ~isa("VariableDeclaration"):
@@ -65,5 +63,5 @@ export transformTails(path, allowLoops, allowExprs, getNewNode) ->
           // Anonymous class declaration gets replaced with ClassExpression
           tailPath.replaceWith(toStatement(getNewNode(tailPath.node~toClassExpression(), tailPath)))
         else:
-          // Named class declaration gets
+          // Named class declaration gets return inserted after
           tailPath.insertAfter(toStatement(getNewNode(tailPath.node.id, tailPath)))

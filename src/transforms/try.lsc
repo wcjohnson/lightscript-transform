@@ -48,7 +48,7 @@ transformVarDeclTryExpression(path, tryExprPath): void ->
 
   // Re-tail the `try` statement so it assigns its final value to `_val`
   tryPath = path.getPrevSibling()
-  transformTails(tryPath, false, false, (node) ->
+  transformTails(tryPath, false, (node) ->
     t.assignmentExpression("=", resRef, node)~atNode(node)
   )
 

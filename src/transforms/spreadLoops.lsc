@@ -62,7 +62,6 @@ transformJSXComprehensionTails(loopPath, ref) ->
   transformTails(
     bodyPath
     true
-    false
     (expr) ->
       now foundOne = true
       t.callExpression(
@@ -102,7 +101,6 @@ transformObjectComprehensionTails(loopPath, id): void ->
   transformTails(
     bodyPath
     true
-    false
     (expr) ->
       now foundOne = true
 
@@ -163,7 +161,6 @@ transformArrayComprehensionTails(loopPath, ref): void ->
   transformTails(
     bodyPath
     true
-    false
     (expr) ->
       now foundOne = true
       t.callExpression(

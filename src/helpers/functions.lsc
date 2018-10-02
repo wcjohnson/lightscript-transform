@@ -35,7 +35,6 @@ export addImplicitReturns(functionPath) ->
   transformTails(
     functionPath.get("body")
     false
-    false
     transform
   )
 
