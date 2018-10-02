@@ -19,7 +19,7 @@ shouldElideImplicitReturns(node) ->
 
 // Add "return" statements to all expressions in tail position inside the
 // body of the function at the given Babel traversal path.
-export addImplicitReturns(functionPath) ->
+export addImplicitReturns(functionPath, nothrow) ->
   node = functionPath.node
   if node~shouldElideImplicitReturns(): return
 
@@ -27,7 +27,10 @@ export addImplicitReturns(functionPath) ->
   transform(expr, path) ->
     if path~isa("VariableDeclaration"):
       if path.node.declarations.length > 1:
-        throw path.buildCodeFrameError("Ambiguous implicit `return` of multiple variables. " +
+        if nothrow:
+          return
+        else:
+          throw path.buildCodeFrameError("Ambiguous implicit `return` of multiple variables. " +
           "Add an explicit `return` statement on the next line.")
 
     t.returnStatement(expr)~atNode(expr)

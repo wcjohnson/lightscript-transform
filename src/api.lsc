@@ -2,5 +2,6 @@ import types, { is, isa } from './types'
 import * as parser from '@lightscript/parser'
 import * as tooling from './tooling'
 import traverse from '@babel/traverse'
+import { addImplicitReturns } from './helpers/functions'
 
 export { types, is, isa, parser, tooling, traverse }
