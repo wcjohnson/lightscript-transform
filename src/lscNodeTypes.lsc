@@ -343,6 +343,18 @@ export registerLightscriptNodeTypes(t): void ->
       },
     });
 
+  if not t.hasType("LscTryStatement"):
+    definePluginType("LscTryStatement", {
+      builder: ["block"],
+      visitor: ["block"],
+      aliases: ["Statement"],
+      fields: {
+        block: {
+          validate: assertNodeType("Expression", "BlockStatement"),
+        },
+      },
+    });
+
   if not t.hasType("LscSafeAwaitExpression"):
     definePluginType("LscSafeAwaitExpression", {
       builder: ["argument"],

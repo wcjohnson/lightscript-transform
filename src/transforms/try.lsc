@@ -99,3 +99,9 @@ export transformTryStatement(path): void ->
   { node } = path
   normalizeTryStatement(node, path)
   path.replaceWith(node)
+
+export transformLscTryStatement(path): void ->
+  { node } = path
+  node.type = "TryStatement"
+  normalizeTryStatement(node, path)
+  path.replaceWith(node)

@@ -2,7 +2,7 @@ import { checkImplicitConstShadowing } from '../helpers/variables'
 import { transformForInArrayStatement, transformForInObjectStatement, maybeTransformAutoConstDeclaration } from "../transforms/for"
 import { transformTildeCall, transformOptionalTildeCall } from '../transforms/tildeCalls'
 import { maybeReplaceWithInlinedOperator } from '../transforms/inlinedOperators'
-import { transformTryExpression, transformTryStatement } from "../transforms/try"
+import { transformTryExpression, transformTryStatement, transformLscTryStatement } from "../transforms/try"
 import { transformNamedArrowFunction, transformNamedArrowMemberExpression, transformArrowFunctionExpression } from "../transforms/arrows"
 import { transformClassBody, transformObjectMethod } from "../transforms/classes"
 import { maybeTransformArrayWithSpreadLoops, maybeTransformObjectWithSpreadLoops, maybeTransformJSXExpressionWithSpreadLoop, transformSpreadElement } from "../transforms/spreadLoops"
@@ -95,6 +95,9 @@ export default main(state, path): void ->
 
     TryStatement(path): void ->
       transformTryStatement(path)
+
+    LscTryStatement(path): void ->
+      transformLscTryStatement(path)
 
     VariableDeclaration(path): void ->
       checkImplicitConstShadowing(path)
