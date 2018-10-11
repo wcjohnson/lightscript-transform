@@ -29,6 +29,7 @@ export compilerOptions = {
   placeholder: {
     description: "Specify an identifier to be transformed into PlaceholderExpression."
     valueType: "string"
+    defaultValue: "_"
   }
   disableJsx: {
     description: "Don't parse JSX expressions."
