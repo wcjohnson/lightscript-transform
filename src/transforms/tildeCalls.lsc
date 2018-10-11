@@ -21,7 +21,7 @@ export transformOptionalTildeCall(path) ->
   let hoistedLeft = node.left
   let hoistedCallee = node.callee
 
-  leftCheck = if node.leftOptional or node.left~isOptionalNode():
+  leftCheck = if node.leftOptional:
     memoized = hoistRef(path, node.left)
     now hoistedLeft = memoized.ref
     t.binaryExpression('!=', memoized.assign, t.nullLiteral())
@@ -40,6 +40,9 @@ export transformOptionalTildeCall(path) ->
   if node.typeArguments: callNode.typeArguments = node.typeArguments
   if node.typeParameters: callNode.typeParameters = node.typeParameters
 
-  path.replaceWith(
-    t.conditionalExpression(conditionalTest, callNode, path.scope.buildUndefinedNode())
-  )
+  if conditionalTest:
+    path.replaceWith(
+      t.conditionalExpression(conditionalTest, callNode, path.scope.buildUndefinedNode())
+    )
+  else:
+    path.replaceWith(callNode)
