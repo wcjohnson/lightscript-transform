@@ -1,16 +1,22 @@
 import t from '../types'
 import { placeAtNode as atNode } from 'ast-loc-utils'
 
+normalizeArg(arg) ->
+  if arg:
+    arg
+  else:
+    t.unaryExpression("void", t.numericLiteral(0))
+
 inlinedOperator = {
-  looseEq: (args) => t.binaryExpression("==", args[0], args[1])
-  looseNotEq: (args) => t.binaryExpression("!=", args[0], args[1])
-  bitwiseNot: (args) => t.unaryExpression("~", args[0])
-  bitwiseAnd: (args) => t.binaryExpression("&", args[0], args[1])
-  bitwiseOr: (args) => t.binaryExpression("|", args[0], args[1])
-  bitwiseXor: (args) => t.binaryExpression("^", args[0], args[1])
-  bitwiseLeftShift: (args) => t.binaryExpression("<<", args[0], args[1])
-  bitwiseRightShift: (args) => t.binaryExpression(">>", args[0], args[1])
-  bitwiseZeroFillRightShift: (args) => t.binaryExpression(">>>", args[0], args[1])
+  looseEq: (args) => t.binaryExpression("==", normalizeArg(args[0]), normalizeArg(args[1]))
+  looseNotEq: (args) => t.binaryExpression("!=", normalizeArg(args[0]), normalizeArg(args[1]))
+  bitwiseNot: (args) => t.unaryExpression("~", normalizeArg(args[0]))
+  bitwiseAnd: (args) => t.binaryExpression("&", normalizeArg(args[0]), normalizeArg(args[1]))
+  bitwiseOr: (args) => t.binaryExpression("|", normalizeArg(args[0]), normalizeArg(args[1]))
+  bitwiseXor: (args) => t.binaryExpression("^", normalizeArg(args[0]), normalizeArg(args[1]))
+  bitwiseLeftShift: (args) => t.binaryExpression("<<", normalizeArg(args[0]), normalizeArg(args[1]))
+  bitwiseRightShift: (args) => t.binaryExpression(">>", normalizeArg(args[0]), normalizeArg(args[1]))
+  bitwiseZeroFillRightShift: (args) => t.binaryExpression(">>>", normalizeArg(args[0]), normalizeArg(args[1]))
 }
 
 export maybeReplaceWithInlinedOperator(state, path) ->
