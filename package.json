@@ -1,6 +1,6 @@
 {
   "name": "@lightscript/transform",
-  "version": "4.0.0-alpha.22",
+  "version": "4.0.0-alpha.23",
   "license": "MIT",
   "description": "Babel 7 transform converting LightScript code to ES2018.",
   "main": "lib/index.js",
@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@babel/types": "^7.0.0",
-    "@lightscript/parser": "4.0.0-alpha.22",
+    "@lightscript/parser": "4.0.0-alpha.23",
     "@oigroup/lightscript-runtime": "^0.1.1",
     "ast-loc-utils": "^1.1.0",
     "find-babel-config": "^1.1.0"
