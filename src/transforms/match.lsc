@@ -53,7 +53,9 @@ isStrictEqualityLiteral(node) ->
   (node~isa("Literal") and (not node~isa("RegExpLiteral")))
 
 isPredicate(node) ->
-  node~isa("LscTildeCallExpression")
+  node~isa("LscTildeCallExpression") or
+  node~isa("CallExpression") or
+  node~isa("BinaryExpression")
 
 transformAtom(mtch, path) ->
   { discriminantRef, compilerState } = mtch
