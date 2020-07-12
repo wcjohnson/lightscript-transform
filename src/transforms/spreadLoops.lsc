@@ -19,6 +19,7 @@ validateComprehensionBody(path) ->
     noScope: true
 
     Function(path): void -> path.skip()
+    LscFunction(path): void -> path.skip()
 
     AwaitExpression(awaitPath) ->
       throw awaitPath.buildCodeFrameError(

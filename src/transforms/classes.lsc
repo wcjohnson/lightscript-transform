@@ -14,6 +14,7 @@ export containsSuperCall(path) ->
     // XXX: this may not be necessary due to super calls in free functions
     // being syntax errors caught by js engine.
     Function(path): void -> path.skip()
+    LscFunction(path): void -> path.skip()
 
     Super(superPath): void ->
       if is("CallExpression", superPath.parentPath):

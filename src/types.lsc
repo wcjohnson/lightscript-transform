@@ -10,7 +10,11 @@ registerLightscriptNodeTypes(t)
 export isType(nodeType, targetType) ->
   if nodeType === targetType: return true
 
-  aliases = t.FLIPPED_ALIAS_KEYS[targetType]
+  let aliases = t.FLIPPED_ALIAS_KEYS[targetType]
+  if aliases:
+    for elem e in aliases: if nodeType === e: return true
+
+  now aliases = t.PLUGIN_ALIAS_KEYS[targetType]
   if aliases:
     for elem e in aliases: if nodeType === e: return true
 

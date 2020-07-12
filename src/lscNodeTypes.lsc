@@ -145,7 +145,6 @@ export registerLightscriptNodeTypes(t): void ->
       visitor: ["id", "params", "body", "returnType", "typeParameters"],
       aliases: [
         "Scopable",
-        "Function",
         "BlockParent",
         "FunctionParent",
         "Statement",
@@ -153,6 +152,10 @@ export registerLightscriptNodeTypes(t): void ->
         "Declaration",
         "FunctionDeclaration",
         "LscNamedArrowFunction",
+        "LscFunction",
+      ],
+      pluginAliases: [
+        "Function"
       ],
       fields: {  // DUP in NamedArrowMemberExpression
         id: {
@@ -193,7 +196,11 @@ export registerLightscriptNodeTypes(t): void ->
         "Expression",
         "Pureish",
         "LscNamedArrowFunction",
+        "LscFunction",
       ],
+      pluginAliases: [
+        "Function"
+      ]
     });
 
   if not t.hasType("LscNamedArrowMemberExpression"):

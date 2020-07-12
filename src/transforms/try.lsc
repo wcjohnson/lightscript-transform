@@ -61,6 +61,7 @@ transformPessimizedTryExpression(path): void ->
     noScope: true
 
     Function(path): void -> path.skip()
+    LscFunction(path): void -> path.skip()
 
     AwaitExpression(awaitPath) ->
       now needsAsync = true
