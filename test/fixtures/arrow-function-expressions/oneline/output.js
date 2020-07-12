@@ -13,11 +13,11 @@
   }
 };
 
-() => thrownew Error();
+() => throw new Error();
 
-(() => thrownew Error())();
+(() => throw new Error())();
 
-const f = () => thrownew Error();
+const f = () => throw new Error();
 
 ;
 f();

@@ -1,3 +1,3 @@
 async function f() {
-  return console.log((await x));
+  return console.log(await x);
 }

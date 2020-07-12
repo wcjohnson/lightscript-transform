@@ -48,7 +48,9 @@ export transformTails(path, allowLoops, getNewNode) ->
   for elem tailPath in tailPaths:
     match tailPath:
       | ~isa("ExpressionStatement"):
-        tailPath.replaceWith(getNewNode(tailPath.node.expression, tailPath)~toStatement())
+        nextNode = getNewNode(tailPath.node.expression, tailPath)
+        if nextNode:
+          tailPath.replaceWith(nextNode~toStatement())
       | ~isa("VariableDeclaration"):
         decls = tailPath.node.declarations
 
