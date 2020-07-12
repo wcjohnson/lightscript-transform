@@ -1,5 +1,6 @@
-import t, { is } from '../types'
+import t, { is, isa } from '../types'
 import { restToSpread, spreadIsAlreadySafe } from '../helpers/variables'
+import { getFunctionParent } from '../helpers/blocks'
 
 // Check if the given path or any of its descendants contains a `super()`
 // call expression.
@@ -95,13 +96,13 @@ export bindMethodsInConstructor(classPath, constructorPath, methodIds) ->
   if (classPath.node.superClass) {
     constructorPath.traverse({
       Super(superPath) {
-        if (!superPath.parentPath.isCallExpression()) return;
+        if (!superPath.parentPath~isa("CallExpression")) return;
         let superStatementPath = superPath.getStatementParent();
 
         // things get super weird when you return super();
         // TODO: consider trying to handle it
         let enclosingReturn = superPath
-          .findParent((p) => p.isReturnStatement() && p.getFunctionParent() === constructorPath.parentPath);
+          .findParent((p) => p~isa("ReturnStatement") && p~getFunctionParent() === constructorPath.parentPath);
         if (enclosingReturn) throw new Error("Can't use => with `return super()`; try removing `return`.");
 
         superStatementPath.insertAfter(assignments);
@@ -114,17 +115,17 @@ export bindMethodsInConstructor(classPath, constructorPath, methodIds) ->
 
 export bindMethods(path, methodIds) ->
   let assignId, inExpression = false;
-  if (path.isClassDeclaration()) {
+  if (path~isa("ClassDeclaration")) {
     now assignId = path.node.id;
   } else if (
-    path.parentPath.isAssignmentExpression() &&
-    path.parentPath.parentPath.isExpressionStatement()
+    path.parentPath~isa("AssignmentExpression") &&
+    path.parentPath.parentPath~isa("ExpressionStatement")
   ) {
     now assignId = path.parentPath.node.left;
-  } else if (path.parentPath.isVariableDeclarator()) {
+  } else if (path.parentPath~isa("VariableDeclarator")) {
     now assignId = path.parentPath.node.id;
   } else {
-    let id = path.isClass() ? "class" : "obj";
+    let id = path~isa("Class") ? "class" : "obj";
     now assignId = path.getStatementParent().scope.generateDeclaredUidIdentifier(id);
     now inExpression = true;
   }
@@ -133,7 +134,7 @@ export bindMethods(path, methodIds) ->
   let assignments = methodIds.map((methodId) => {
     // could be computed, eg `['blah']() => {}`
     t.assertOneOf(methodId, ["Identifier", "Expression"]);
-    let isComputed = !t.isIdentifier(methodId);
+    let isComputed = !(methodId~isa("Identifier"));
     let objDotMethod = t.memberExpression(assignId, methodId, isComputed);
     let bind = t.callExpression(
       t.memberExpression(objDotMethod, t.identifier("bind")),

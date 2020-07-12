@@ -119,17 +119,17 @@ export blockToExpression(path) ->
 // Locate the path that determines the variable scope at the given path.
 export getScopeParent(path) ->
   path.findParent((path) ->
-    path.isFunction() or path.isBlockStatement() or path.isProgram()
+    path~isa("Function") or path~isa("BlockStatement") or path~isa("Program")
   )
 
 export getBlockScopeParent(path) ->
   path.findParent((path) ->
-    path.isFunction() or path~isa("BlockParent") or path.isProgram()
+    path~isa("Function") or path~isa("BlockParent") or path~isa("Program")
   )
 
 export getFunctionScopeParent(path) ->
   path.findParent((path) ->
-    path.isFunction() or path.isProgram()
+    path~isa("Function") or path~isa("Program")
   )
 
 export getFunctionParent(path) ->
