@@ -1,6 +1,6 @@
 import findBabelOptionsForPlugin from './util/findBabelOptionsForPlugin'
 import parseConfigurationDirectives from './util/parseConfigurationDirectives'
-import patch from './util/babelTypesPatch'
+import { registrationAPI } from './types'
 import { registerLightscriptNodeTypes } from './lscNodeTypes'
 
 import { Options } from './state/options'
@@ -58,8 +58,7 @@ export class CompilerState:
 
     // Patch the relevant instance of babel-types
     { babel } = this
-    patch(babel.types)
-    registerLightscriptNodeTypes(babel.types)
+    registerLightscriptNodeTypes(babel.types, registrationAPI)
 
     // Execute compiler passes
     mainPass(this, path)

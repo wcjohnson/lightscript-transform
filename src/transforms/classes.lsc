@@ -1,4 +1,4 @@
-import t, { is, isa } from '../types'
+import t, { is, isa, assertOneOf } from '../types'
 import { restToSpread, spreadIsAlreadySafe } from '../helpers/variables'
 import { getFunctionParent } from '../helpers/blocks'
 
@@ -77,7 +77,7 @@ export ensureConstructor(classPath, constructorBodyPath, withSuper = true) ->
 export bindMethodsInConstructor(classPath, constructorPath, methodIds) ->
   // `this.method = this.method.bind(this);`
   assignments = [...for elem methodId in methodIds:
-    t.assertOneOf(methodId, ["Identifier", "Expression"])
+    assertOneOf(methodId, ["Identifier", "Expression"])
     isComputed = !is("Identifier", methodId)
 
     thisDotMethod = t.memberExpression(t.thisExpression(), methodId, isComputed)
@@ -130,11 +130,11 @@ export bindMethods(path, methodIds) ->
     now assignId = path.getStatementParent().scope.generateDeclaredUidIdentifier(id);
     now inExpression = true;
   }
-  t.assertOneOf(assignId, ["Identifier", "MemberExpression"]);
+  assertOneOf(assignId, ["Identifier", "MemberExpression"]);
 
   let assignments = methodIds.map((methodId) => {
     // could be computed, eg `['blah']() => {}`
-    t.assertOneOf(methodId, ["Identifier", "Expression"]);
+    assertOneOf(methodId, ["Identifier", "Expression"]);
     let isComputed = !(methodId~isa("Identifier"));
     let objDotMethod = t.memberExpression(assignId, methodId, isComputed);
     let bind = t.callExpression(

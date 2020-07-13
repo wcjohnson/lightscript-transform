@@ -1,12 +1,12 @@
-export registerLightscriptNodeTypes(t): void ->
+export registerLightscriptNodeTypes(t, api): void ->
   {
     definePluginType, assertNodeType
     assertValueType, assertOneOf
-    assertEach, chain
-  } = t
+    assertEach, chain, hasType
+  } = api
 
-  if not t.hasType("LscTildeCallExpression"):
-    definePluginType("LscTildeCallExpression", {
+  if not t~hasType("LscTildeCallExpression"):
+    t~definePluginType("LscTildeCallExpression", {
       visitor: ["left", "callee", "arguments", "typeParameters", "typeArguments"],
       builder: ["left", "callee", "arguments"],
       aliases: ["Expression"],
@@ -44,8 +44,8 @@ export registerLightscriptNodeTypes(t): void ->
       },
     })
 
-  if not t.hasType("LscOptionalTildeCallExpression"):
-    definePluginType("LscOptionalTildeCallExpression", {
+  if not t~hasType("LscOptionalTildeCallExpression"):
+    t~definePluginType("LscOptionalTildeCallExpression", {
       visitor: ["left", "callee", "arguments", "typeParameters", "typeArguments"],
       builder: ["left", "callee", "arguments"],
       aliases: ["Expression"],
@@ -83,8 +83,8 @@ export registerLightscriptNodeTypes(t): void ->
       },
     })
 
-  if not t.hasType("LscForInArrayStatement"):
-    definePluginType("LscForInArrayStatement", {
+  if not t~hasType("LscForInArrayStatement"):
+    t~definePluginType("LscForInArrayStatement", {
       visitor: ["idx", "elem", "array", "body"],
       aliases: ["Scopable", "Statement", "For", "BlockParent", "Loop", "ForXStatement", "ForIn"],
       fields: {
@@ -105,8 +105,8 @@ export registerLightscriptNodeTypes(t): void ->
       },
     });
 
-  if not t.hasType("LscForInObjectStatement"):
-    definePluginType("LscForInObjectStatement", {
+  if not t~hasType("LscForInObjectStatement"):
+    t~definePluginType("LscForInObjectStatement", {
       visitor: ["key", "val", "object", "body"],
       aliases: ["Scopable", "Statement", "For", "BlockParent", "Loop", "ForXStatement", "ForIn"],
       fields: {
@@ -127,8 +127,8 @@ export registerLightscriptNodeTypes(t): void ->
       },
     });
 
-  if not t.hasType("LscSpreadLoop"):
-    definePluginType("LscSpreadLoop", {
+  if not t~hasType("LscSpreadLoop"):
+    t~definePluginType("LscSpreadLoop", {
       builder: ["loop"]
       visitor: ["loop"]
       aliases: ["Expression"]
@@ -139,8 +139,8 @@ export registerLightscriptNodeTypes(t): void ->
       }
     })
 
-  if not t.hasType("LscNamedArrowDeclaration"):
-    definePluginType("LscNamedArrowDeclaration", {
+  if not t~hasType("LscNamedArrowDeclaration"):
+    t~definePluginType("LscNamedArrowDeclaration", {
       builder: ["id", "params", "body", "skinny", "async", "generator"],
       visitor: ["id", "params", "body", "returnType", "typeParameters"],
       aliases: [
@@ -184,8 +184,8 @@ export registerLightscriptNodeTypes(t): void ->
       },
     });
 
-  if not t.hasType("LscNamedArrowExpression"):
-    definePluginType("LscNamedArrowExpression", {
+  if not t~hasType("LscNamedArrowExpression"):
+    t~definePluginType("LscNamedArrowExpression", {
       inherits: "LscNamedArrowDeclaration",
       aliases: [
         "Scopable",
@@ -203,8 +203,8 @@ export registerLightscriptNodeTypes(t): void ->
       ]
     });
 
-  if not t.hasType("LscNamedArrowMemberExpression"):
-    definePluginType("LscNamedArrowMemberExpression", {
+  if not t~hasType("LscNamedArrowMemberExpression"):
+    t~definePluginType("LscNamedArrowMemberExpression", {
       inherits: "LscNamedArrowExpression",
       visitor: ["object", "id", "params", "body", "returnType", "typeParameters"],
       fields: {  // c/p from NamedArrowExpression except for `object`
@@ -237,8 +237,8 @@ export registerLightscriptNodeTypes(t): void ->
       },
     });
 
-  if not t.hasType("LscIfExpression"):
-    definePluginType("LscIfExpression", {
+  if not t~hasType("LscIfExpression"):
+    t~definePluginType("LscIfExpression", {
       visitor: ["test", "consequent", "alternate"],
       aliases: ["Expression", "Conditional"],
       fields: {
@@ -255,8 +255,8 @@ export registerLightscriptNodeTypes(t): void ->
       }
     });
 
-  if not t.hasType("LscMatchExpression"):
-    definePluginType("LscMatchExpression", {
+  if not t~hasType("LscMatchExpression"):
+    t~definePluginType("LscMatchExpression", {
       builder: ["discriminant", "cases"],
       visitor: ["discriminant", "cases"],
       aliases: ["Expression", "Conditional"],
@@ -270,8 +270,8 @@ export registerLightscriptNodeTypes(t): void ->
       }
     });
 
-  if not t.hasType("LscMatchStatement"):
-    definePluginType("LscMatchStatement", {
+  if not t~hasType("LscMatchStatement"):
+    t~definePluginType("LscMatchStatement", {
       builder: ["discriminant", "cases"],
       visitor: ["discriminant", "cases"],
       aliases: ["Statement", "Conditional"],
@@ -285,8 +285,8 @@ export registerLightscriptNodeTypes(t): void ->
       }
     });
 
-  if not t.hasType("LscMatchCase"):
-    definePluginType("LscMatchCase", {
+  if not t~hasType("LscMatchCase"):
+    t~definePluginType("LscMatchCase", {
       builder: ["outerGuard", "atoms", "binding", "assertive", "innerGuard", "consequent"],
       visitor: ["outerGuard", "atoms", "binding", "innerGuard", "consequent"],
       fields: {
@@ -316,22 +316,22 @@ export registerLightscriptNodeTypes(t): void ->
       }
     });
 
-  if not t.hasType("LscMatchElse"):
-    definePluginType("LscMatchElse", {
+  if not t~hasType("LscMatchElse"):
+    t~definePluginType("LscMatchElse", {
     });
 
-  if not t.hasType("LscMatchPlaceholderExpression"):
-    definePluginType("LscMatchPlaceholderExpression", {
+  if not t~hasType("LscMatchPlaceholderExpression"):
+    t~definePluginType("LscMatchPlaceholderExpression", {
       aliases: ["Expression"]
     });
 
-  if not t.hasType("LscPlaceholderExpression"):
-    definePluginType("LscPlaceholderExpression", {
+  if not t~hasType("LscPlaceholderExpression"):
+    t~definePluginType("LscPlaceholderExpression", {
       aliases: ["Expression"]
     });
 
-  if not t.hasType("LscTryExpression"):
-    definePluginType("LscTryExpression", {
+  if not t~hasType("LscTryExpression"):
+    t~definePluginType("LscTryExpression", {
       builder: ["block", "handler", "finalizer"],
       visitor: ["block", "handler", "finalizer"],
       aliases: ["Expression"],
@@ -350,8 +350,8 @@ export registerLightscriptNodeTypes(t): void ->
       },
     });
 
-  if not t.hasType("LscTryStatement"):
-    definePluginType("LscTryStatement", {
+  if not t~hasType("LscTryStatement"):
+    t~definePluginType("LscTryStatement", {
       builder: ["block"],
       visitor: ["block"],
       aliases: ["Statement"],
@@ -362,8 +362,8 @@ export registerLightscriptNodeTypes(t): void ->
       },
     });
 
-  if not t.hasType("LscSafeAwaitExpression"):
-    definePluginType("LscSafeAwaitExpression", {
+  if not t~hasType("LscSafeAwaitExpression"):
+    t~definePluginType("LscSafeAwaitExpression", {
       builder: ["argument"],
       visitor: ["argument"],
       aliases: ["AwaitExpression", "Expression", "Terminatorless"],
