@@ -5,12 +5,9 @@
 //
 // These methods are copy/pasted from babel-types/src/definitions/utils.js
 
+import { addPluginAliasKey, seal } from './pluginAliasKeys'
+
 export default patchBabelTypes(t) ->
-  if t._hasExtensibleTypesPatch: return t
-  t._hasExtensibleTypesPatch = true
-
-  t.PLUGIN_ALIAS_KEYS = {}
-
   // Generic builder based on babel-types/src/builders/builder.js
   BUILDER_KEYS = t.BUILDER_KEYS
   makeGenericBuilder(type) ->
@@ -225,10 +222,11 @@ export default patchBabelTypes(t) ->
       if (!t.TYPES[alias]) t.TYPES.push(alias);
     });
 
+    // Add plugin-only aliases
     opts.pluginAliases.forEach((alias) => {
-      t.PLUGIN_ALIAS_KEYS[alias] = t.PLUGIN_ALIAS_KEYS[alias] || [alias];
-      t.PLUGIN_ALIAS_KEYS[alias].push(type);
+      addPluginAliasKey(type, alias)
     })
+    seal(type)
 
     // Create a builder for the new node type.
     // Babel does this through code generation but we must do it manually

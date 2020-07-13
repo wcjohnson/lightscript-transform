@@ -1,0 +1,11 @@
+export PLUGIN_ALIAS_KEYS = {}
+
+sealed = {}
+
+export addPluginAliasKey(type, alias): void ->
+  if sealed[type]: return
+  PLUGIN_ALIAS_KEYS[alias] = PLUGIN_ALIAS_KEYS[alias] || [alias];
+  PLUGIN_ALIAS_KEYS[alias].push(type);
+
+export seal(type): void ->
+  sealed[type] = true

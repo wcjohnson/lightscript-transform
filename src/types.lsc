@@ -1,4 +1,5 @@
 import patch from './util/babelTypesPatch'
+import { PLUGIN_ALIAS_KEYS } from './util/pluginAliasKeys'
 import { registerLightscriptNodeTypes } from './lscNodeTypes'
 import * as t from '@babel/types'
 
@@ -14,7 +15,7 @@ export isType(nodeType, targetType) ->
   if aliases:
     for elem e in aliases: if nodeType === e: return true
 
-  now aliases = t.PLUGIN_ALIAS_KEYS[targetType]
+  now aliases = PLUGIN_ALIAS_KEYS[targetType]
   if aliases:
     for elem e in aliases: if nodeType === e: return true
 
@@ -26,6 +27,18 @@ export is(type: string, node: Object): boolean ->
 // Flipped for use with lightscript ~ operator
 export isa(node: Object, type: string): boolean ->
   node and isType(node.type, type)
+
+// Get all aliases (including plugin aliases) for the given type
+aliases = {}
+export getAliasesFor(type: string): Array<string> ->
+  if aliases[type]: return aliases[type]
+
+  aliases[type] = if PLUGIN_ALIAS_KEYS[type]:
+    t.FLIPPED_ALIAS_KEYS[type].concat(PLUGIN_ALIAS_KEYS[type])
+  else:
+    t.FLIPPED_ALIAS_KEYS[type]
+
+  aliases[type]
 
 export { t as types }
 export default t
