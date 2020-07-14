@@ -1,6 +1,6 @@
 const o = {
   *f(x) {
-    return yield x;
+    yield x;
   }
 
 };

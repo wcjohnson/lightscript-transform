@@ -1,5 +1,5 @@
 function* fn() {
-  return yield this;
+  yield this;
 }
 
 fn = fn.bind(this)

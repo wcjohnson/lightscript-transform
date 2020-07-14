@@ -1,5 +1,5 @@
 const o = {
   f: function* () {
-    return yield this;
+    yield this;
   }.bind(this)
 };

@@ -4,7 +4,7 @@ class A {
   }
 
   *f() {
-    return yield this;
+    yield this;
   }
 
 }

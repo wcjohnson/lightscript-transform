@@ -37,6 +37,9 @@ export addImplicitReturns(functionPath, nothrow) ->
     if expr~isa("UnaryExpression") and expr.operator == 'throw':
       return
 
+    // Don't implicit-return a YieldExpression
+    if expr~isa("YieldExpression"): return
+
     t.returnStatement(expr)~atNode(expr)
 
   transformTails(
