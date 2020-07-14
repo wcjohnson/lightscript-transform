@@ -57,6 +57,8 @@ export statementsToExpression(path, nodes: Array<Object>) ->
     if exprs.length === 1: exprs[0] else: seqExpr
   elif seqExpr:
     seqExpr
+  elif path~isAsyncBodyPath():
+    awaitIife(nodes)
   else:
     iife(nodes)
 
@@ -152,3 +154,20 @@ export iife(body, async = false) ->
     )~atLoc(loc)
     []
   )~atLoc(loc)
+
+export awaitIife(body) ->
+  asyncIife = iife(body, true)
+  t.awaitExpression(asyncIife)~atNode(asyncIife)
+
+export isAsyncBodyPath(bodyPath) ->
+  let result = false
+  bodyPath.traverse({
+    noScope: true
+
+    Function(path): void -> path.skip()
+    LscFunction(path): void -> path.skip()
+
+    AwaitExpression(): void ->
+      now result = true
+  })
+  result
