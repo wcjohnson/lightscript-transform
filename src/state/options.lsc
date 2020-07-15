@@ -4,6 +4,11 @@ export compilerOptions = {
   stdlib: {
     description: "Configure the LightScript standard library"
   }
+  _lodash: {
+    description: "Enable legacy lodash importing"
+    valueType: "boolean"
+    defaultValue: false
+  }
   patternMatching: {
     description: "Test and branch using `match` keyword"
     valueType: "boolean"
@@ -176,8 +181,4 @@ export class Options:
     if not this.isLightScript: return false
     { lscOpts: opts } = this
 
-    if typeof(opts.stdlib) == "object":
-      if opts.stdlib.lodash:
-        return true
-
-    false
+    opts?._lodash or opts?.stdlib?.lodash

@@ -29,7 +29,7 @@ export class Imports:
   initialize() ->
     { lscOpts: opts } = this.options
 
-    if opts?.stdlib?.lodash:
+    if opts?._lodash or opts?.stdlib?.lodash:
       this.loadLodashSymbols()
 
     if opts.useRequire == true: this.useRequire = true
