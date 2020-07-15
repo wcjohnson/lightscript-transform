@@ -4,7 +4,8 @@ export transformAssignmentExpression(path): void ->
   { node } = path
 
   // Transform await arrows to ordinary assignment
-  if (node.operator === "<-"): node.operator = "="
+  if (node.operator === "<-" or node.operator === "<!-"):
+    node.operator = "="
 
   // Don't enforce `now` with MemberExprs
   if path.node.left~isa("MemberExpression"): return
