@@ -1,5 +1,14 @@
 import t, { isa } from "../types"
 
+isTwoValuedSafeAwaitPattern(patternNode): boolean ->
+  patternNode~isa("ArrayPattern")
+  and patternNode.elements.length == 2
+
+isTwoValuedSafeAwaitPath(path): boolean ->
+  (path.parent~isa("VariableDeclarator") and path.parent.id~isTwoValuedSafeAwaitPattern())
+  or (path.parent~isa("AssignmentExpression") and path.parent.left~isTwoValuedSafeAwaitPattern())
+
+
 export transformAwaitExpression(path): void ->
   if (path.get("argument")~isa("ArrayExpression")):
     promiseDotAllCall = t.callExpression(
@@ -14,5 +23,5 @@ export transformSafeAwaitExpression(path): void ->
     tryStmt = t.tryStatement(t.blockStatement([t.expressionStatement(t.awaitExpression(node.argument))]))
     path.parentPath.replaceWith(tryStmt)
   else:
-    tryExpr = t.LscTryExpression(t.awaitExpression(node.argument))
+    tryExpr = t.LscTryExpression(t.awaitExpression(node.argument), null, null, path~isTwoValuedSafeAwaitPath())
     path.replaceWith(tryExpr)

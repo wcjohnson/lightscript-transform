@@ -7,6 +7,8 @@ import {
 } from 'ast-loc-utils'
 
 normalizeTryStatement(node, path): void ->
+  // Removed twoValued key which is invalid on a TryStatement
+  delete node.twoValued
   // Turn stuff into blocks as needed
   if node.block: node.block = node.block~toBlockStatement()
   if node.handler?.body: node.handler.body = node.handler.body~toBlockStatement()
@@ -24,19 +26,24 @@ normalizeTryStatement(node, path): void ->
 
 transformVarDeclTryExpression(path, tryExprPath): void ->
   { node } = tryExprPath
+  { twoValued } = node
 
   // Starting from `const x = try ...`
   // Add `let _val`
   //    let _val
   //    const x = try ...
   resRef = path.scope.generateUidIdentifier("val")
-  path.insertBefore! t.variableDeclaration("let", [t.variableDeclarator(resRef)])
+  errRef = if twoValued: path.scope.generateUidIdentifier("err")
+  path.insertBefore! t.variableDeclaration("let", [t.variableDeclarator(resRef), ...if errRef: [t.variableDeclarator(errRef)]])
 
   // replace `try ...` with `_val`
   //    let _val
   //    const x = _val
   declaratorPath = path.get("declarations.0")
-  declaratorPath.node.init = resRef
+  declaratorPath.node.init = if twoValued:
+    t.arrayPattern([resRef, errRef])
+  else:
+    resRef
 
   // Turn the original node into a try statement and add it before the decl
   //    let _val
@@ -44,16 +51,55 @@ transformVarDeclTryExpression(path, tryExprPath): void ->
   //    const x = _val
   node.type = "TryStatement"
   normalizeTryStatement(node, tryExprPath)
-  path.insertBefore! node
+  path.insertBefore(node)
 
-  // Re-tail the `try` statement so it assigns its final value to `_val`
+  // Re-tail the `try` statement so it assigns its final value to the variables
   tryPath = path.getPrevSibling()
-  transformTails(tryPath, false, (node) ->
-    t.assignmentExpression("=", resRef, node)~atNode(node)
-  )
+  block = tryPath.get("block")
+  if block:
+    transformTails(block, false, (node) ->
+      t.assignmentExpression("=", resRef, node)~atNode(node)
+    )
+
+  handler = tryPath.get("handler")
+  if handler:
+    transformTails(handler, false, (node) ->
+      t.assignmentExpression("=", errRef or resRef, node)~atNode(node)
+    )
+
+// Transform a try expression on the rhs of a qualifying assignment
+transformAssignmentStatementTryExpression(assignmentStatementPath, tryExprPath): void ->
+  { node } = tryExprPath
+  { twoValued } = node
+
+  // Get the target variables for assignment
+  assignmentExprNode = assignmentStatementPath.node.expression
+  resRef = if twoValued: assignmentExprNode.left.elements[0] else: assignmentExprNode.left
+  errRef = if twoValued: assignmentExprNode.left.elements[1] else: assignmentExprNode.left
+
+  // Starting from `now x = try ...`
+  // Turn the expr node into a TryStatement
+  node.type = "TryStatement"
+  normalizeTryStatement(node, tryExprPath)
+  // Replace the assignment statement with the try
+  assignmentStatementPath.replaceWith(node)
+  tryPath = assignmentStatementPath
+  // Inside the try, replace the tails with assignments to the target variables
+  block = tryPath.get("block")
+  if block:
+    transformTails(block, false, (node) ->
+      t.assignmentExpression("=", resRef, node)~atNode(node)
+    )
+
+  handler = tryPath.get("handler")
+  if handler:
+    transformTails(handler, false, (node) ->
+      t.assignmentExpression("=", errRef, node)~atNode(node)
+    )
 
 transformPessimizedTryExpression(path): void ->
   { node } = path
+  twoValued = node.twoValued
 
   // If there are any awaits beneath us, we need async.
   let needsAsync = false
@@ -74,6 +120,23 @@ transformPessimizedTryExpression(path): void ->
   node.type = "TryStatement"
   normalizeTryStatement(node, path)
 
+  // For two-valued try, make sure result is stored in the first element of an array
+  // and error in the second.
+  if twoValued:
+    undef = path.scope.buildUndefinedNode()
+
+    block = path.get("block")
+    if block:
+      transformTails(block, false, (node) ->
+        t.arrayExpression([node, undef])~atNode(node)
+      )
+
+    handler = path.get("handler")
+    if handler:
+      transformTails(handler, false, (node) ->
+        t.arrayExpression([undef, node])~atNode(node)
+      )
+
   iife = t.callExpression(
     t.arrowFunctionExpression(
       []
@@ -83,18 +146,22 @@ transformPessimizedTryExpression(path): void ->
     []
   )
 
-  path.replaceWith(iife)
+  path.replaceWith(if needsAsync: t.awaitExpression(iife) else: iife)
 
 isVarDeclTryExpr(path) ->
   path.parent~isa("VariableDeclarator")
   and path.parentPath.parent.declarations.length == 1
   and path.parentPath.parentPath.listKey == "body"
 
+isAssignmentStatementTryExpr(path) ->
+  path.parent~isa("AssignmentExpression")
+  and path.parentPath.parent~isa("ExpressionStatement")
+
 export transformTryExpression(path): void ->
-  if path~isVarDeclTryExpr!:
-    transformVarDeclTryExpression(path.parentPath.parentPath, path)
-  else:
-    transformPessimizedTryExpression(path)
+  match path:
+    | ~isVarDeclTryExpr(): transformVarDeclTryExpression(path.parentPath.parentPath, path)
+    | ~isAssignmentStatementTryExpr(): transformAssignmentStatementTryExpression(path.parentPath.parentPath, path)
+    | else: transformPessimizedTryExpression(path)
 
 export transformTryStatement(path): void ->
   { node } = path
