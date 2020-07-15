@@ -2,9 +2,9 @@ async function f() {
   let result, err;
 
   try {
-    result = await g();
+    [result, err] = [await g(), void 0];
   } catch (_err) {
-    err = _err;
+    [result, err] = [void 0, _err];
   }
 
   if (result) return result;

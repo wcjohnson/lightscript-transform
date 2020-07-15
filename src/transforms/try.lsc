@@ -71,6 +71,7 @@ transformVarDeclTryExpression(path, tryExprPath): void ->
 transformAssignmentStatementTryExpression(assignmentStatementPath, tryExprPath): void ->
   { node } = tryExprPath
   { twoValued } = node
+  undef = assignmentStatementPath.scope.buildUndefinedNode()
 
   // Get the target variables for assignment
   assignmentExprNode = assignmentStatementPath.node.expression
@@ -86,16 +87,35 @@ transformAssignmentStatementTryExpression(assignmentStatementPath, tryExprPath):
   tryPath = assignmentStatementPath
   // Inside the try, replace the tails with assignments to the target variables
   block = tryPath.get("block")
+
   if block:
-    transformTails(block, false, (node) ->
-      t.assignmentExpression("=", resRef, node)~atNode(node)
-    )
+    if twoValued:
+      transformTails(block, false, (node) ->
+        t.assignmentExpression(
+          "="
+          t.arrayPattern([resRef, errRef])~atNode(node)
+          t.arrayExpression([node, undef])~atNode(node)
+        )~atNode(node)
+      )
+    else:
+      transformTails(block, false, (node) ->
+        t.assignmentExpression("=", resRef, node)~atNode(node)
+      )
 
   handler = tryPath.get("handler")
   if handler:
-    transformTails(handler, false, (node) ->
-      t.assignmentExpression("=", errRef, node)~atNode(node)
-    )
+    if twoValued:
+      transformTails(handler, false, (node) ->
+        t.assignmentExpression(
+          "="
+          t.arrayPattern([resRef, errRef])~atNode(node)
+          t.arrayExpression([undef, node])~atNode(node)
+        )~atNode(node)
+      )
+    else:
+      transformTails(handler, false, (node) ->
+        t.assignmentExpression("=", errRef, node)~atNode(node)
+      )
 
 transformPessimizedTryExpression(path): void ->
   { node } = path
