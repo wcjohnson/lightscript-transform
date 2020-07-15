@@ -1,4 +1,3 @@
-import result from "lodash/result";
 ({
   entry: function func() {
     return result;

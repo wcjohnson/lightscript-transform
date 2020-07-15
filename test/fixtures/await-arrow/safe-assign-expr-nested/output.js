@@ -1,5 +1,3 @@
-import isError from "lodash/isError";
-
 async function fn() {
   let x;
 

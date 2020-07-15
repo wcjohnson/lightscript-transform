@@ -1,7 +1,6 @@
 {
   "plugins": [
     ["@lightscript/transform", {
-      "useRequire": true,
       "stdlib": { "lodash": true }
     }]
   ]

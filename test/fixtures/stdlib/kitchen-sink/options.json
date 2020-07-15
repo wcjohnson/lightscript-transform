@@ -2,6 +2,7 @@
   "plugins": [
     ["@lightscript/transform", {
       "stdlib": {
+        "lodash": true,
         "PropTypes": "react",
         "redux": "redux *"
       }

@@ -177,9 +177,7 @@ export class Options:
     { lscOpts: opts } = this
 
     if typeof(opts.stdlib) == "object":
-      if opts.stdlib.lodash != false:
-        return true
-    elif opts.stdlib != false:
+      if opts.stdlib.lodash:
         return true
 
     false

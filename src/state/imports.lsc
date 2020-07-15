@@ -29,12 +29,8 @@ export class Imports:
   initialize() ->
     { lscOpts: opts } = this.options
 
-    if typeof(opts.stdlib) == "object":
-      if opts.stdlib.lodash != false:
-        this.loadLodashSymbols()
-    else:
-      if opts.stdlib != false:
-        this.loadLodashSymbols()
+    if opts?.stdlib?.lodash:
+      this.loadLodashSymbols()
 
     if opts.useRequire == true: this.useRequire = true
 
