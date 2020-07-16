@@ -41,7 +41,7 @@ transformVarDeclTryExpression(path, tryExprPath): void ->
   //    const x = _val
   declaratorPath = path.get("declarations.0")
   declaratorPath.node.init = if twoValued:
-    t.arrayPattern([resRef, errRef])
+    t.arrayExpression([resRef, errRef])
   else:
     resRef
 
