@@ -189,7 +189,6 @@ export registerLightscriptNodeTypes(t, api): void ->
       inherits: "LscNamedArrowDeclaration",
       aliases: [
         "Scopable",
-        "Function",
         "FunctionExpression",
         "BlockParent",
         "FunctionParent",
