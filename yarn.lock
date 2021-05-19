@@ -233,6 +233,18 @@
     "@babel/helper-validator-identifier" "^7.14.0"
     to-fast-properties "^2.0.0"
 
+"@lightscript/parser@4.0.0-alpha.34":
+  version "4.0.0-alpha.34"
+  resolved "https://registry.yarnpkg.com/@lightscript/parser/-/parser-4.0.0-alpha.34.tgz#2d40c4367ba42911edc28e45ebdcbe765ce4fb6f"
+  integrity sha512-oYj+PYB2US3a5axZBbCr2udDWDvvYf9dG1Bx082dIRLbGymI9Ul/bWO68/wg4Oubx4gm7UsRGGRA2SfE0TgQeQ==
+
+"@lightscript/runtime@^0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@lightscript/runtime/-/runtime-0.1.1.tgz#0b10ace1da6625dbea3a8c709cfe48ea52e11ebb"
+  integrity sha512-u/FQAMuLXtPEy8mLN/Hcuq1Zjf69z5eV1WShXAI0tMl9WwotfmTElB5MpnCUx5c57mj543WCqAeMHDqCElfK3Q==
+  dependencies:
+    core-js "^2.0.0"
+
 "@oigroup/babel-plugin-lightscript@3.1.1":
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/@oigroup/babel-plugin-lightscript/-/babel-plugin-lightscript-3.1.1.tgz#38e1127c6ff66a7ba7a6692f38e4d96de21497d8"
@@ -5381,9 +5393,9 @@ xml-name-validator@^3.0.0:
   integrity sha512-A5CUptxDsvxKJEU3yO6DuWBSJz/qizqzJKOMIfUJHETbBw/sFaDxgd6fxm1ewUaM0jZ444Fc5vC5ROYurg/4Pw==
 
 y18n@^3.2.1:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/y18n/-/y18n-3.2.1.tgz#6d15fba884c08679c0d77e88e7759e811e07fa41"
-  integrity sha1-bRX7qITAhnnA136I53WegR4H+kE=
+  version "3.2.2"
+  resolved "https://registry.yarnpkg.com/y18n/-/y18n-3.2.2.tgz#85c901bd6470ce71fc4bb723ad209b70f7f28696"
+  integrity sha512-uGZHXkHnhF0XeeAPgnKfPv1bgKAYyVvmNL1xlKsPYZPaIHxGti2hHqvOCQv71XMsLxu1QjergkqogUnms5D3YQ==
 
 yallist@^2.1.2:
   version "2.1.2"
