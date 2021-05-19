@@ -22,17 +22,17 @@
     "lint": "eslint --ext .js,.lsc src"
   },
   "dependencies": {
-    "@babel/types": "^7.10.4",
+    "@babel/types": "^7.14.2",
     "@lightscript/parser": "4.0.0-alpha.34",
     "@oigroup/lightscript-runtime": "^0.1.1",
     "ast-loc-utils": "^1.1.0",
     "find-babel-config": "^1.2.0"
   },
   "peerDependencies": {
-    "@babel/core": "^7.10.4"
+    "@babel/core": "^7.14.3"
   },
   "devDependencies": {
-    "@babel/core": "^7.10.4",
+    "@babel/core": "^7.14.3",
     "@lightscript/runtime": "^0.1.1",
     "@oigroup/babel-preset-lightscript": "^3.1.1",
     "@oigroup/lightscript-eslint": "^3.1.1",
