@@ -1,7 +1,11 @@
 import { CompilerState } from './state'
 import * as api from './api'
+import { registerLightscriptNodeTypesWithBabelInstance } from './types'
 
 export default LightScript(babel) ->
+  // Register LightScript's node types with Babel
+  registerLightscriptNodeTypesWithBabelInstance(babel)
+
   plugin = {
     manipulateOptions(opts, parserOpts): void ->
       state = new CompilerState(babel)

@@ -56,9 +56,5 @@ export class CompilerState:
     this.imports.initialize()
     setGlobalState(this)
 
-    // Patch the relevant instance of babel-types
-    { babel } = this
-    registerLightscriptNodeTypes(babel.types, registrationAPI)
-
     // Execute compiler passes
     mainPass(this, path)

@@ -239,5 +239,8 @@ export registrationAPI = {
 
 registerLightscriptNodeTypes(t, registrationAPI)
 
+export registerLightscriptNodeTypesWithBabelInstance(babel) ->
+  registerLightscriptNodeTypes(babel.types, registrationAPI)
+
 export { t as types }
 export default t
