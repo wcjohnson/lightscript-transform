@@ -237,10 +237,10 @@ export registrationAPI = {
   assertEach, chain
 }
 
-registerLightscriptNodeTypes(t, registrationAPI)
+registerLightscriptNodeTypes(t, registrationAPI, "bootstrap")
 
 export registerLightscriptNodeTypesWithBabelInstance(babel) ->
-  registerLightscriptNodeTypes(babel.types, registrationAPI)
+  registerLightscriptNodeTypes(babel.types, registrationAPI, "babel instance")
 
 export { t as types }
 export default t

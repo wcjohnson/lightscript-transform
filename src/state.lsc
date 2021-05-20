@@ -1,7 +1,7 @@
+import traverse from '@babel/traverse'
+
 import findBabelOptionsForPlugin from './util/findBabelOptionsForPlugin'
 import parseConfigurationDirectives from './util/parseConfigurationDirectives'
-import { registrationAPI } from './types'
-import { registerLightscriptNodeTypes } from './lscNodeTypes'
 
 import { Options } from './state/options'
 import { Imports } from './state/imports'
@@ -40,7 +40,8 @@ export class CompilerState:
 
     //console.log("parseOverride", lscParserOpts)
 
-    parse(code, lscParserOpts)
+    ast = parse(code, lscParserOpts)
+    ast
 
   // Determine if the file we're working on should be treated as LightScript.
   isLightScript(): boolean ->
@@ -51,10 +52,19 @@ export class CompilerState:
     // Only transform LightScript files.
     if not this.isLightScript(): return
 
+    // Create a new traversal context using our own internal babel-traverse
+    let fileNode = path.parent
+    let programPath = null
+    traverse(fileNode, {
+      Program(path): void {
+        now programPath = path
+      }
+    })
+
     // Initialize the state vector
-    this.programPath = path
+    this.programPath = programPath
     this.imports.initialize()
     setGlobalState(this)
 
     // Execute compiler passes
-    mainPass(this, path)
+    mainPass(this, programPath)

@@ -23,4 +23,4 @@ export default LightScript(babel) ->
     }
   }
 
-export { api }
+export { api, registerLightscriptNodeTypesWithBabelInstance }

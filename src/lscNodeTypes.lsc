@@ -1,4 +1,4 @@
-export registerLightscriptNodeTypes(t, api): void ->
+export registerLightscriptNodeTypes(t, api, context): void ->
   {
     definePluginType, assertNodeType
     assertValueType, assertOneOf
