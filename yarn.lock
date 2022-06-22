@@ -233,6 +233,18 @@
     "@babel/helper-validator-identifier" "^7.14.0"
     to-fast-properties "^2.0.0"
 
+"@lightscript/parser@4.0.0-alpha.38":
+  version "4.0.0-alpha.38"
+  resolved "https://registry.yarnpkg.com/@lightscript/parser/-/parser-4.0.0-alpha.38.tgz#49ba1c8edd4ac0ed46e721b5e6d1bbf702f8b5ca"
+  integrity sha512-dX0XX6A6uBLpHQhShjgnXm2qllFrlViQfGCtKEH0IjOobTw7fqhvFeetBEPEX/9MxvAhFH71ejHKjh9/vosMeg==
+
+"@lightscript/runtime@^0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@lightscript/runtime/-/runtime-0.1.1.tgz#0b10ace1da6625dbea3a8c709cfe48ea52e11ebb"
+  integrity sha512-u/FQAMuLXtPEy8mLN/Hcuq1Zjf69z5eV1WShXAI0tMl9WwotfmTElB5MpnCUx5c57mj543WCqAeMHDqCElfK3Q==
+  dependencies:
+    core-js "^2.0.0"
+
 "@oigroup/babel-plugin-lightscript@3.1.1":
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/@oigroup/babel-plugin-lightscript/-/babel-plugin-lightscript-3.1.1.tgz#38e1127c6ff66a7ba7a6692f38e4d96de21497d8"
@@ -4729,9 +4741,9 @@ shebang-regex@^1.0.0:
   integrity sha1-2kL0l0DAtC2yypcoVxyxkMmO/qM=
 
 shell-quote@^1.6.1:
-  version "1.7.2"
-  resolved "https://registry.yarnpkg.com/shell-quote/-/shell-quote-1.7.2.tgz#67a7d02c76c9da24f99d20808fcaded0e0e04be2"
-  integrity sha512-mRz/m/JVscCrkMyPqHc/bczi3OQHkLTqXHEFu0zDhK/qfv3UcOA4SVmRCLmos4bhjr9ekVQubj/R7waKapmiQg==
+  version "1.7.3"
+  resolved "https://registry.yarnpkg.com/shell-quote/-/shell-quote-1.7.3.tgz#aa40edac170445b9a431e17bb62c0b881b9c4123"
+  integrity sha512-Vpfqwm4EnqGdlsBFNmHhxhElJYrdfcxPThu+ryKS5J8L/fhAwLazFZtq+S+TWZ9ANj2piSQLGj6NQg+lKPmxrw==
 
 shelljs@0.7.6:
   version "0.7.6"
