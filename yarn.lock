@@ -233,6 +233,18 @@
     "@babel/helper-validator-identifier" "^7.14.0"
     to-fast-properties "^2.0.0"
 
+"@lightscript/parser@4.0.0-alpha.38":
+  version "4.0.0-alpha.38"
+  resolved "https://registry.yarnpkg.com/@lightscript/parser/-/parser-4.0.0-alpha.38.tgz#49ba1c8edd4ac0ed46e721b5e6d1bbf702f8b5ca"
+  integrity sha512-dX0XX6A6uBLpHQhShjgnXm2qllFrlViQfGCtKEH0IjOobTw7fqhvFeetBEPEX/9MxvAhFH71ejHKjh9/vosMeg==
+
+"@lightscript/runtime@^0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@lightscript/runtime/-/runtime-0.1.1.tgz#0b10ace1da6625dbea3a8c709cfe48ea52e11ebb"
+  integrity sha512-u/FQAMuLXtPEy8mLN/Hcuq1Zjf69z5eV1WShXAI0tMl9WwotfmTElB5MpnCUx5c57mj543WCqAeMHDqCElfK3Q==
+  dependencies:
+    core-js "^2.0.0"
+
 "@oigroup/babel-plugin-lightscript@3.1.1":
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/@oigroup/babel-plugin-lightscript/-/babel-plugin-lightscript-3.1.1.tgz#38e1127c6ff66a7ba7a6692f38e4d96de21497d8"
@@ -1696,9 +1708,9 @@ decamelize@^1.1.1:
   integrity sha1-9lNNFRSCabIDUue+4m9QH5oZEpA=
 
 decode-uri-component@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/decode-uri-component/-/decode-uri-component-0.2.0.tgz#eb3913333458775cb84cd1a1fae062106bb87545"
-  integrity sha1-6zkTMzRYd1y4TNGh+uBiEGu4dUU=
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/decode-uri-component/-/decode-uri-component-0.2.2.tgz#e69dbe25d37941171dd540e024c444cd5188e1e9"
+  integrity sha512-FqUYQ+8o158GyGTrMFJms9qh3CqTKvAqgqsTnkLI8sKu0028orqBhxNMFkFen0zGyg6epACD32pjVk58ngIErQ==
 
 dedent@0.6.0:
   version "0.6.0"
